@@ -1,0 +1,16 @@
+{
+  "name": "derivative-game",
+  "version": "1.0.0",
+  "description": "A simple derivative math game in JavaScript using WebSockets",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
+  },
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "author": "Victor Liu",
+  "license": "Apache-2.0"
+}
