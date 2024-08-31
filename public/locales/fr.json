@@ -1,0 +1,17 @@
+{
+  "title": "Jeu mathématique de dérivées",
+  "currentFunction": "Fonction actuelle :",
+  "derivativeRules": "Règles de Dérivation :",
+  "functionDerivatives": "Dérivées de Fonctions :",
+  "applyPowerRule": "Puissance",
+  "applyChainRule": "Composition",
+  "applyProductRule": "Produit",
+  "applyQuotientRule": "Quotient",
+  "applyLinearityRule": "Linéarité",
+  "exponentialFunction": "Fonction exponentielle",
+  "logarithmicFunction": "Fonction logarithmique",
+  "trigonometricFunction": "Fonction trigonométrique",
+  "inverseTrigonometricFunction": "Fonction réciproque trigonométrique",
+  "connected": "Connecté au serveur !",
+  "disconnected": "Déconnecté du serveur"
+}

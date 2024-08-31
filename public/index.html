@@ -5,13 +5,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Derivative Math Game</title>
+    <!-- Include KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+    <div id="languageSwitcher">
+        <button id="langFr">Français</button>
+        <button id="langEn">English</button>
+    </div>
+
     <h1>Derivative Math Game</h1>
     <p id="messages"></p>
-    <button id="sendMessageButton">Send a Message</button>
-    <script src="script.js"></script>
+
+    <!-- Display the Current Function -->
+    <div>
+        <h2>Current Function:</h2>
+        <p id="currentFunction" class="fade-scale-in"></p>
+    </div>
+
+    <!-- Derivative Rule Buttons -->
+    <div id="derivativeRules">
+        <h3>Derivative Rules:</h3>
+        <button id="powerRuleButton">Apply Power Rule</button>
+        <button id="productRuleButton">Apply Product Rule</button>
+        <button id="chainRuleButton">Apply Chain Rule</button>
+        <button id="quotientRuleButton">Apply Quotient Rule</button>
+        <button id="linearityRuleButton">Apply Linearity Rule</button>
+    </div>
+
+    <!-- Function Derivative Buttons -->
+    <div id="functionDerivativeButtons">
+        <h3>Function Derivatives:</h3>
+        <button id="exponentialFunctionButton">Exponential Function</button>
+        <button id="logarithmicFunctionButton">Logarithmic Function</button>
+        <button id="trigonometricFunctionButton">Trigonometric Function</button>
+        <button id="inverseTrigonometricFunctionButton">Inverse Trigonometric Function</button>
+    </div>
+
+    <!-- Include KaTeX JS -->
+    <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Include MathJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.1.1/math.min.js"></script>
+
+    <!-- Include Modular JavaScript Public Files -->
+    <script type="module" src="/js/room.js"></script>
+    <script type="module" src="/js/websocket.js"></script>
+    <script type="module" src="/js/translations.js"></script>
+    <script type="module" src="/js/ui.js"></script>
+    <script type="module" src="/js/main.js"></script>
 </body>
 
 </html>

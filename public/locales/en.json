@@ -1,0 +1,17 @@
+{
+  "title": "Derivative Math Game",
+  "currentFunction": "Current Function:",
+  "derivativeRules": "Derivative Rules:",
+  "functionDerivatives": "Function Derivatives:",
+  "applyPowerRule": "Power Rule",
+  "applyProductRule": "Product Rule",
+  "applyChainRule": "Chain Rule",
+  "applyQuotientRule": "Quotient Rule",
+  "applyLinearityRule": "Linearity Rule",
+  "exponentialFunction": "Exponential Function",
+  "logarithmicFunction": "Logarithmic Function",
+  "trigonometricFunction": "Trigonometric Function",
+  "inverseTrigonometricFunction": "Inverse Trigonometric Function",
+  "connected": "Connected to the server!",
+  "disconnected": "Disconnected from the server"
+}
