@@ -1,4 +1,4 @@
-import { joinRoom, leaveRoom, broadcastMessage, rooms } from './roomManager.js';
+import { joinRoom, leaveRoom, broadcastMessage, updateCurrentExpression, rooms } from './roomManager.js';
 import { calculateDerivative } from './derivativeRules.js';
 
 export function handleWebSocketConnection(ws) {
@@ -9,18 +9,27 @@ export function handleWebSocketConnection(ws) {
 
         if (data.type === 'join') {
             currentRoom = data.room;
-            joinRoom(ws, currentRoom, (roomFunction) => {
-                ws.send(JSON.stringify({ type: 'newFunction', function: roomFunction }));
+            joinRoom(ws, currentRoom, (currentExpression) => {
+                ws.send(JSON.stringify({ type: 'newExpression', expression: currentExpression }));
             });
         }
 
         if (data.type === 'applyRule' && currentRoom) {
             const roomData = rooms[currentRoom];
-            const calculatedDerivative = calculateDerivative(roomData.currentFunction, data.rule);
-            ws.send(JSON.stringify({
-                type: calculatedDerivative ? 'derivativeCorrect' : 'derivativeIncorrect',
-                result: calculatedDerivative ? calculatedDerivative.toString() : 'Error'
-            }));
+            const result = calculateDerivative(roomData.currentExpression, data.rule);
+
+            if (result.error) {
+                ws.send(JSON.stringify({
+                    type: 'ruleApplicationError',
+                    result: result.error
+                }));
+            } else {
+                updateCurrentExpression(currentRoom, result.toString());
+                ws.send(JSON.stringify({
+                    type: 'ruleApplicationSuccess',
+                    expression: result.toString()
+                }));
+            }
         }
 
         if (data.type === 'message' && currentRoom) {

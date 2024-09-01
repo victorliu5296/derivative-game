@@ -4,14 +4,22 @@ const rooms = {}; // Keeps track of users in each room
 
 export function joinRoom(ws, room, onJoin) {
     if (!rooms[room]) {
+        const originalFunction = generateRandomFunction();
         rooms[room] = {
             clients: [],
-            function: generateRandomFunction()
+            originalFunction: originalFunction,
+            currentExpression: originalFunction // Initially, the current expression is the original function
         };
     }
 
     rooms[room].clients.push(ws);
-    onJoin(rooms[room].function);
+    onJoin(rooms[room].currentExpression);
+}
+
+export function updateCurrentExpression(room, newExpression) {
+    if (rooms[room]) {
+        rooms[room].currentExpression = newExpression;
+    }
 }
 
 export function leaveRoom(ws, room) {
