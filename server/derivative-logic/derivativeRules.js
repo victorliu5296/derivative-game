@@ -5,25 +5,66 @@ import { createConstant, createVariable, createBinaryOp, createFunction, createD
 export function applyPowerRule(expr) {
     console.log('Expression:', JSON.stringify(expr, null, 2));
 
-    if (expr.type !== 'derivative' || expr.expression.type !== 'binary' || expr.expression.operator !== '^') {
+    if (expr.type !== 'derivative') {
         return expr;
     }
 
-    const base = expr.expression.left;
-    const exponent = expr.expression.right;
+    const innerExpr = expr.expression;
 
-    if (exponent.type !== 'constant') {
-        return expr;
+    // Case 1: Explicit power (u^v)
+    if (innerExpr.type === 'binary' && innerExpr.operator === '^') {
+        const base = innerExpr.left;
+        const exponent = innerExpr.right;
+
+        console.log('Applying Power Rule (explicit power)');
+
+        // If exponent is constant, use simple power rule with direct computation
+        if (exponent.type === 'constant') {
+            if (exponent.value === 1) {
+                return createDerivative(base, expr.variable);
+            } else {
+                const newExponent = createConstant(exponent.value - 1);
+                return createBinaryOp('*',
+                    exponent,
+                    createBinaryOp('^', base, newExponent)
+                );
+            }
+        } else {
+            // General case: d/dx(u^v) = v * u^(v-1) * du/dx + u^v * ln(u) * dv/dx
+            return createBinaryOp('+',
+                createBinaryOp('*',
+                    exponent,
+                    createBinaryOp('*',
+                        createBinaryOp('^', base, createBinaryOp('-', exponent, createConstant(1))),
+                        createDerivative(base, expr.variable)
+                    )
+                ),
+                createBinaryOp('*',
+                    createBinaryOp('^', base, exponent),
+                    createBinaryOp('*',
+                        createFunction('ln', base),
+                        createDerivative(exponent, expr.variable)
+                    )
+                )
+            );
+        }
     }
 
-    console.log('Applying Power Rule');
-    return createBinaryOp('*',
-        createBinaryOp('*',
-            exponent,
-            createBinaryOp('^', base, createBinaryOp('-', exponent, createConstant(1)))
-        ),
-        createDerivative(base)
-    );
+
+    // Case 2: Implicit power of 1 (x or cx)
+    else if (innerExpr.type === 'variable' ||
+        (innerExpr.type === 'binary' && innerExpr.operator === '*' &&
+            ((innerExpr.left.type === 'constant' && innerExpr.right.type === 'variable') ||
+                (innerExpr.right.type === 'constant' && innerExpr.left.type === 'variable')))) {
+        console.log('Applying Power Rule (implicit power of 1)');
+        if (innerExpr.type === 'variable') {
+            return createConstant(1);
+        } else {
+            return innerExpr.left.type === 'constant' ? innerExpr.left : innerExpr.right;
+        }
+    }
+
+    return expr;
 }
 
 export function applyProductRule(expr) {
@@ -33,13 +74,19 @@ export function applyProductRule(expr) {
         return expr;
     }
 
-    console.log('Applying Product Rule');
     const left = expr.expression.left;
     const right = expr.expression.right;
 
+    // Check if either operand is a constant
+    if (left.type === 'constant' || right.type === 'constant') {
+        console.log('Skipping Product Rule due to constant factor');
+        return expr;
+    }
+
+    console.log('Applying Product Rule');
     return createBinaryOp('+',
-        createBinaryOp('*', createDerivative(left), right),
-        createBinaryOp('*', left, createDerivative(right))
+        createBinaryOp('*', createDerivative(left, expr.variable), right),
+        createBinaryOp('*', left, createDerivative(right, expr.variable))
     );
 }
 
