@@ -1,8 +1,7 @@
-const { joinRoom, leaveRoom, broadcastMessage } = require('./roomManager');
-const { generateRandomFunction, calculateDerivative } = require('./functionUtils');
-const { random } = require('mathjs');
+import { joinRoom, leaveRoom, broadcastMessage, roomFunctions } from './roomManager.js';
+import { calculateDerivative } from './derivativeRules.js';
 
-function handleWebSocketConnection(ws) {
+export function handleWebSocketConnection(ws) {
     let currentRoom = null;
 
     ws.on('message', (message) => {
@@ -10,19 +9,20 @@ function handleWebSocketConnection(ws) {
 
         if (data.type === 'join') {
             currentRoom = data.room;
-            joinRoom(ws, currentRoom, () => {
-                const randomFunction = generateRandomFunction();
-                const derivative = calculateDerivative(randomFunction);
-
-                // Send the function and derivative to the client
-                ws.send(JSON.stringify({ type: 'newFunction', function: randomFunction }));
-                ws.send(JSON.stringify({ type: 'derivativeResult', result: derivative }));
+            joinRoom(ws, currentRoom, (roomFunction) => {
+                ws.send(JSON.stringify({ type: 'newFunction', function: roomFunction }));
             });
         }
 
-        if (data.type === 'submitFunction' && currentRoom) {
-            const result = calculateDerivative(data.function);
-            broadcastMessage(currentRoom, JSON.stringify({ type: 'derivativeResult', result }));
+        if (data.type === 'applyRule' && currentRoom) {
+            const roomData = roomFunctions[currentRoom];
+            const calculatedDerivative = calculateDerivative(roomData.currentFunction, data.rule);
+
+            if (calculatedDerivative && calculatedDerivative.toString() === roomData.correctDerivative) {
+                ws.send(JSON.stringify({ type: 'derivativeCorrect', result: calculatedDerivative.toString() }));
+            } else {
+                ws.send(JSON.stringify({ type: 'derivativeIncorrect', result: calculatedDerivative ? calculatedDerivative.toString() : 'Error' }));
+            }
         }
 
         if (data.type === 'message' && currentRoom) {
@@ -36,5 +36,3 @@ function handleWebSocketConnection(ws) {
         }
     });
 }
-
-module.exports = { handleWebSocketConnection };

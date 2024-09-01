@@ -24,3 +24,32 @@
 .fade-scale-in.animate {
     animation: fadeInAndScale 0.6s ease-out forwards;
 }
+
+/* Shaking animation for error feedback */
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+
+    75% {
+        transform: translateX(-5px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.shake-error {
+    animation: shake 0.5s;
+    color: red;
+    /* Optional: Change text color to red during the error */
+}

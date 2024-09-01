@@ -38,10 +38,31 @@
     <!-- Function Derivative Buttons -->
     <div id="functionDerivativeButtons">
         <h3>Function Derivatives:</h3>
-        <button id="exponentialFunctionButton">Exponential Function</button>
-        <button id="logarithmicFunctionButton">Logarithmic Function</button>
-        <button id="trigonometricFunctionButton">Trigonometric Function</button>
-        <button id="inverseTrigonometricFunctionButton">Inverse Trigonometric Function</button>
+
+        <!-- Fieldset for Exponential and Logarithmic functions -->
+        <fieldset>
+            <legend>Exponential and Logarithmic Functions</legend>
+            <button id="exponentialFunctionButton">Exponential Function</button>
+            <button id="logarithmicFunctionButton">Logarithmic Function</button>
+        </fieldset>
+
+        <!-- Fieldset for Trigonometric Functions -->
+        <fieldset>
+            <legend>Trigonometric Functions</legend>
+            <div>
+                <button id="rewriteTrigonometricFunctionsButton">Rewrite Trigonometric Functions</button>
+            </div>
+            <div id="trigonometricFunctionsButtons">
+                <button id="sineFunctionButton">Sine Function</button>
+                <button id="cosineFunctionButton">Cosine Function</button>
+                <button id="tangentFunctionButton">Tangent Function</button>
+            </div>
+            <div id="inverseTrigonometricFunctionsButtons">
+                <button id="inverseSineFunctionButton">Inverse Sine Function</button>
+                <button id="inverseCosineFunctionButton">Inverse Cosine Function</button>
+                <button id="inverseTangentFunctionButton">Inverse Tangent Function</button>
+            </div>
+        </fieldset>
     </div>
 
     <!-- Include KaTeX JS -->

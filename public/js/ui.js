@@ -25,10 +25,14 @@ export function setupRuleButtons() {
 
 export function setupFunctionDerivativeButtons() {
     const derivativeButtons = [
-        { id: 'exponentialFunctionButton', rule: 'Exponential' },
-        { id: 'logarithmicFunctionButton', rule: 'Logarithmic' },
-        { id: 'trigonometricFunctionButton', rule: 'Trigonometric' },
-        { id: 'inverseTrigonometricFunctionButton', rule: 'Inverse Trigonometric' },
+        { id: 'exponentialFunctionButton', rule: 'exponential' },
+        { id: 'logarithmicFunctionButton', rule: 'logarithmic' },
+        { id: 'sineFunctionButton', rule: 'sine' },
+        { id: 'cosineFunctionButton', rule: 'cosine' },
+        { id: 'tangentFunctionButton', rule: 'tangent' },
+        { id: 'inverseSineFunctionButton', rule: 'inverseSine' },
+        { id: 'inverseCosineFunctionButton', rule: 'inverseCosine' },
+        { id: 'inverseTangentFunctionButton', rule: 'inverseTangent' },
     ];
 
     derivativeButtons.forEach(({ id, rule }) => {
@@ -43,6 +47,41 @@ export function setupFunctionDerivativeButtons() {
             });
         }
     });
+}
+
+export function setupWebSocketHandlers() {
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'derivativeResult') {
+            if (data.result && data.result.error) {
+                triggerErrorAnimation('currentFunction', data.result.error);
+            } else {
+                renderWithAnimation('currentFunction', data.result);
+            }
+        }
+
+        if (data.type === 'newFunction') {
+            renderWithAnimation('currentFunction', data.function);
+        }
+
+        if (data.type === 'message') {
+            displayMessage(data.message);
+        }
+    };
+}
+
+function displayMessage(message) {
+    const messagesElement = document.getElementById('messages');
+    messagesElement.textContent = message;
+}
+
+function triggerErrorAnimation(elementId, errorMessage) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.classList.add('shake-error');
+        setTimeout(() => element.classList.remove('shake-error'), 1000); // Remove animation after 1 second
+    }
 }
 
 export function renderWithAnimation(elementId, latexString) {

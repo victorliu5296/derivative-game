@@ -2,6 +2,7 @@
   "name": "derivative-game",
   "version": "1.0.0",
   "description": "A simple derivative math game in JavaScript using WebSockets",
+  "type": "module",
   "main": "server.js",
   "dependencies": {
     "express": "^4.19.2",

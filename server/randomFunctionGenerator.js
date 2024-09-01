@@ -1,6 +1,4 @@
-const math = require('mathjs');
-
-function generateRandomFunction() {
+export function generateRandomFunction() {
     const numTerms = Math.floor(Math.random() * 3) + 2; // 2 to 4 terms
     const terms = [];
     const usedTypes = new Set();
@@ -45,21 +43,3 @@ function generateRandomFunction() {
 
     return terms.join(' + ').replace(/\+ -/g, '- ');
 }
-
-/**
- * Calculates the derivative of a given expression.
- * @param {string} expression
- * @returns {string} The mathjs expression object representing the derivative.
- */
-function calculateDerivative(expression) {
-    try {
-        const expr = math.parse(expression);
-        const derivativeResult = math.derivative(expr, 'x');
-
-        return derivativeResult;
-    } catch (error) {
-        return `Error: ${error.message}`;
-    }
-}
-
-module.exports = { generateRandomFunction, calculateDerivative };
