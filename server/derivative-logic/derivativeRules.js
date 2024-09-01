@@ -90,28 +90,40 @@ export function applyChainRule(expr) {
 export function applyLinearityRule(expr) {
     console.log('Expression:', JSON.stringify(expr, null, 2));
 
-    if (expr.type !== 'derivative' || expr.expression.type !== 'binary' || (expr.expression.operator !== '+' && expr.expression.operator !== '-')) {
+    if (expr.type !== 'derivative') {
+        return expr;
+    }
+
+    const innerExpr = expr.expression;
+
+    // Base case: if the inner expression is not a sum, difference, or product with a constant, return unchanged
+    if (innerExpr.type !== 'binary' || (innerExpr.operator !== '+' && innerExpr.operator !== '-' && innerExpr.operator !== '*')) {
         return expr;
     }
 
     console.log('Applying Linearity Rule');
 
-    const left = expr.expression.left;
-    const right = expr.expression.right;
-
-    function handleTerm(term) {
-        if (term.type === 'binary' && term.operator === '*') {
-            if (term.left.type === 'constant') {
-                return createBinaryOp('*', term.left, createDerivative(term.right));
-            } else if (term.right.type === 'constant') {
-                return createBinaryOp('*', term.right, createDerivative(term.left));
-            }
+    if (innerExpr.operator === '+' || innerExpr.operator === '-') {
+        // For addition and subtraction, distribute the derivative
+        return createBinaryOp(innerExpr.operator,
+            createDerivative(innerExpr.left, expr.variable),
+            createDerivative(innerExpr.right, expr.variable)
+        );
+    } else if (innerExpr.operator === '*') {
+        // For multiplication, check if one operand is a constant
+        if (innerExpr.left.type === 'constant') {
+            return createBinaryOp('*',
+                innerExpr.left,
+                createDerivative(innerExpr.right, expr.variable)
+            );
+        } else if (innerExpr.right.type === 'constant') {
+            return createBinaryOp('*',
+                innerExpr.right,
+                createDerivative(innerExpr.left, expr.variable)
+            );
         }
-        return createDerivative(term);
     }
 
-    return createBinaryOp(expr.expression.operator,
-        handleTerm(left),
-        handleTerm(right)
-    );
+    // If we can't apply the rule, return the original expression
+    return expr;
 }
