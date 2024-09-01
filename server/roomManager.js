@@ -5,6 +5,7 @@ const rooms = {}; // Keeps track of users in each room
 export function joinRoom(ws, room, onJoin) {
     if (!rooms[room]) {
         const originalFunction = generateRandomFunction();
+        console.log("Room created: " + room + ", original function: " + originalFunction);
         rooms[room] = {
             clients: [],
             originalFunction: originalFunction,

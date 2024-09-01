@@ -43,7 +43,7 @@ export function generateRandomFunction() {
         }
     }
 
-    return formatForRendering(math.parse(terms.join(' + ').replace(/\+ -/g, '- ')).toTex());
+    return "\\frac{d}{dx} \\left(" + formatForRendering(math.parse(terms.join(' + ').replace(/\+ -/g, '- ')).toTex()) + " \\right)";
 }
 
 function formatForRendering(latex) {
