@@ -34,11 +34,11 @@ socket.onerror = function (error) {
 socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
-    if (data.type === 'ruleApplicationSuccess' || data.type === 'newExpression') {
+    if (data.type === 'newExpression') {
         if (data.expression && data.expression.error) {
-            triggerErrorAnimation('currentFunction', data.expression.error);
+            triggerErrorAnimation('currentExpression', data.expression.error);
         } else {
-            renderWithAnimation('currentFunction', data.expression);
+            renderWithAnimation('currentExpression', data.expression);
         }
     }
 

@@ -26,7 +26,7 @@ export function handleWebSocketConnection(ws) {
             } else {
                 updateCurrentExpression(currentRoom, result.toString());
                 ws.send(JSON.stringify({
-                    type: 'ruleApplicationSuccess',
+                    type: 'newExpression',
                     expression: result.toString()
                 }));
             }
