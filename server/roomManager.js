@@ -1,45 +1,47 @@
-import { generateRandomFunction } from './randomFunctionGenerator.js';
+// roomManager.js
 
-const rooms = {}; // Keeps track of users in each room
+import WebSocket from 'ws';  // Add this import at the top of the file
+import { initializeGame } from './derivative-logic/gameLogic.js';
 
-export function joinRoom(ws, room, onJoin) {
+const rooms = {}; // Keeps track of rooms and their states
+
+export function joinRoom(ws, room) {
     if (!rooms[room]) {
-        const originalFunction = generateRandomFunction();
-        console.log("Room created: " + room + ", original function: " + originalFunction);
         rooms[room] = {
             clients: [],
-            originalFunction: originalFunction,
-            currentKatexExpression: originalFunction // Initially, the current expression is the original function
+            gameState: initializeGame()
         };
     }
 
     rooms[room].clients.push(ws);
-    onJoin(rooms[room].currentKatexExpression);
-}
-
-export function updateCurrentExpression(room, newExpression) {
-    if (rooms[room]) {
-        rooms[room].currentKatexExpression = newExpression;
-    }
+    return rooms[room].gameState.katex;
 }
 
 export function leaveRoom(ws, room) {
     if (rooms[room]) {
-        rooms[room] = rooms[room].clients.filter(user => user !== ws);
-        if (rooms[room].length === 0) {
+        rooms[room].clients = rooms[room].clients.filter(client => client !== ws);
+        if (rooms[room].clients.length === 0) {
             delete rooms[room];
         }
     }
 }
 
-export function broadcastMessage(room, message) {
+export function updateGameState(room, newState) {
     if (rooms[room]) {
-        rooms[room].forEach(user => {
-            if (user.readyState === WebSocket.OPEN) {
-                user.send(message);
+        rooms[room].gameState = newState;
+    }
+}
+
+export function broadcastToRoom(room, message) {
+    if (rooms[room]) {
+        rooms[room].clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify(message));
             }
         });
     }
 }
 
-export { rooms };
+export function getRoomState(room) {
+    return rooms[room] ? rooms[room].gameState : null;
+}

@@ -3,7 +3,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { handleWebSocketConnection } from './wsHandlers.js';
+import { handleWebSocketConnection } from './wsHandler.js';
 
 // Get the current directory equivalent to __dirname in CommonJS
 const __filename = fileURLToPath(import.meta.url);
