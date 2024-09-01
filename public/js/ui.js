@@ -49,41 +49,6 @@ export function setupFunctionDerivativeButtons() {
     });
 }
 
-export function setupWebSocketHandlers() {
-    socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.type === 'derivativeResult') {
-            if (data.result && data.result.error) {
-                triggerErrorAnimation('currentFunction', data.result.error);
-            } else {
-                renderWithAnimation('currentFunction', data.result);
-            }
-        }
-
-        if (data.type === 'newFunction') {
-            renderWithAnimation('currentFunction', data.function);
-        }
-
-        if (data.type === 'message') {
-            displayMessage(data.message);
-        }
-    };
-}
-
-function displayMessage(message) {
-    const messagesElement = document.getElementById('messages');
-    messagesElement.textContent = message;
-}
-
-function triggerErrorAnimation(elementId, errorMessage) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.classList.add('shake-error');
-        setTimeout(() => element.classList.remove('shake-error'), 1000); // Remove animation after 1 second
-    }
-}
-
 export function renderWithAnimation(elementId, latexString) {
     const element = document.getElementById(elementId);
 
@@ -121,4 +86,17 @@ function formatForRendering(latex) {
     latex = latex.replace(/(\{?\w+\}?)(\^{\s*1\s*})/g, '$1');
 
     return latex;
+}
+
+export function displayMessage(message) {
+    const messagesElement = document.getElementById('messages');
+    messagesElement.textContent = message;
+}
+
+export function triggerErrorAnimation(elementId, errorMessage) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.classList.add('shake-error');
+        setTimeout(() => element.classList.remove('shake-error'), 1000); // Remove animation after 1 second
+    }
 }

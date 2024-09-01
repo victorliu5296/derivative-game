@@ -8,17 +8,17 @@ export function joinRoom(ws, room, onJoin) {
         rooms[room] = {
             clients: [],
             originalFunction: originalFunction,
-            currentExpression: originalFunction // Initially, the current expression is the original function
+            currentKatexExpression: originalFunction // Initially, the current expression is the original function
         };
     }
 
     rooms[room].clients.push(ws);
-    onJoin(rooms[room].currentExpression);
+    onJoin(rooms[room].currentKatexExpression);
 }
 
 export function updateCurrentExpression(room, newExpression) {
     if (rooms[room]) {
-        rooms[room].currentExpression = newExpression;
+        rooms[room].currentKatexExpression = newExpression;
     }
 }
 

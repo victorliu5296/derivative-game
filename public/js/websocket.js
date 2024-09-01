@@ -1,4 +1,5 @@
 import { getRoomId } from './room.js';
+import { renderWithAnimation, displayMessage, triggerErrorAnimation } from './ui.js';
 
 const room = getRoomId();
 
@@ -28,4 +29,20 @@ socket.onclose = function (event) {
 
 socket.onerror = function (error) {
     console.error('WebSocket error observed:', error);
+};
+
+socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+
+    if (data.type === 'ruleApplicationSuccess' || data.type === 'newExpression') {
+        if (data.expression && data.expression.error) {
+            triggerErrorAnimation('currentFunction', data.expression.error);
+        } else {
+            renderWithAnimation('currentFunction', data.expression);
+        }
+    }
+
+    if (data.type === 'message') {
+        displayMessage(data.message);
+    }
 };

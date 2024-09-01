@@ -9,8 +9,8 @@ export function handleWebSocketConnection(ws) {
 
         if (data.type === 'join') {
             currentRoom = data.room;
-            joinRoom(ws, currentRoom, (currentExpression) => {
-                ws.send(JSON.stringify({ type: 'newExpression', expression: currentExpression }));
+            joinRoom(ws, currentRoom, (currentKatexExpression) => {
+                ws.send(JSON.stringify({ type: 'newExpression', expression: currentKatexExpression }));
             });
         }
 
