@@ -1,4 +1,4 @@
-import { joinRoom, leaveRoom, broadcastMessage, roomFunctions } from './roomManager.js';
+import { joinRoom, leaveRoom, broadcastMessage, rooms } from './roomManager.js';
 import { calculateDerivative } from './derivativeRules.js';
 
 export function handleWebSocketConnection(ws) {
@@ -15,14 +15,12 @@ export function handleWebSocketConnection(ws) {
         }
 
         if (data.type === 'applyRule' && currentRoom) {
-            const roomData = roomFunctions[currentRoom];
+            const roomData = rooms[currentRoom];
             const calculatedDerivative = calculateDerivative(roomData.currentFunction, data.rule);
-
-            if (calculatedDerivative && calculatedDerivative.toString() === roomData.correctDerivative) {
-                ws.send(JSON.stringify({ type: 'derivativeCorrect', result: calculatedDerivative.toString() }));
-            } else {
-                ws.send(JSON.stringify({ type: 'derivativeIncorrect', result: calculatedDerivative ? calculatedDerivative.toString() : 'Error' }));
-            }
+            ws.send(JSON.stringify({
+                type: calculatedDerivative ? 'derivativeCorrect' : 'derivativeIncorrect',
+                result: calculatedDerivative ? calculatedDerivative.toString() : 'Error'
+            }));
         }
 
         if (data.type === 'message' && currentRoom) {
