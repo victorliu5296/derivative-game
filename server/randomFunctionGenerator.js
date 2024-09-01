@@ -1,44 +1,45 @@
-export function generateRandomFunction() {
-    const numTerms = Math.floor(Math.random() * 3) + 2; // 2 to 4 terms
+export function generateRandomFunction(minTerms = 2, maxTerms = 4, maxDepth = 2) {
+    const numTerms = Math.floor(Math.random() * (maxTerms - minTerms + 1)) + minTerms;
     const terms = [];
-    const usedTypes = new Set();
+
+    function generateTerm(depth = 0) {
+        const functions = ['\\sin', '\\cos', '\\tan', '\\ln', '\\exp'];
+        const operators = ['+', '-', '*', '/'];
+
+        if (depth >= maxDepth || Math.random() < 0.5) {
+            // Generate a basic term
+            const coefficient = Math.floor(Math.random() * 10) + 1;
+            return coefficient === 1 ? 'x' : `${coefficient}x`;
+        } else {
+            // Generate a nested function
+            const func = functions[Math.floor(Math.random() * functions.length)];
+            const innerTerm = generateTerm(depth + 1);
+            return `${func}\\left(${innerTerm}\\right)`;
+        }
+    }
 
     for (let i = 0; i < numTerms; i++) {
-        let termType;
-        do {
-            termType = Math.floor(Math.random() * 6);
-        } while (usedTypes.has(termType) && usedTypes.size < 6);
-        usedTypes.add(termType);
+        let term = generateTerm();
 
-        let coefficient = Math.floor(Math.random() * 5) + 1;
-        coefficient = coefficient === 1 ? '' : coefficient;
-        let term;
-
-        switch (termType) {
-            case 0: // Polynomial
-                let exponent = Math.floor(Math.random() * 3) + 1;
-                exponent = exponent === 1 ? '' : exponent;
-                term = `${coefficient}x^{${exponent}}`;
-                break;
-            case 1: // Sine
-                term = `${coefficient}\\sin(x)`;
-                break;
-            case 2: // Cosine
-                term = `${coefficient}\\cos(x)`;
-                break;
-            case 3: // Tangent
-                term = `${coefficient}\\tan(x)`;
-                break;
-            case 4: // Exponential
-                term = `${coefficient}e^x`;
-                break;
-            case 5: // Logarithmic
-                term = `${coefficient}\\ln(x)`;
-                break;
+        // Randomly add coefficient
+        if (Math.random() < 0.5) {
+            const coefficient = Math.floor(Math.random() * 5) + 2; // 2 to 6
+            term = `${coefficient}${term}`;
         }
 
         terms.push(term);
     }
 
-    return "\\frac{d}{dx} \\left(" + terms.join(' + ') + "\\right)";
+    // Join terms with random operators
+    let expression = terms[0];
+    for (let i = 1; i < terms.length; i++) {
+        const operator = ['+', '-', '\\cdot', '\\frac'][Math.floor(Math.random() * 4)];
+        if (operator === '\\frac') {
+            expression = `\\frac{${expression}}{${terms[i]}}`;
+        } else {
+            expression += ` ${operator} ${terms[i]}`;
+        }
+    }
+
+    return `\\frac{d}{dx} \\left(${expression}\\right)`;
 }
