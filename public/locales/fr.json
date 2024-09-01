@@ -7,7 +7,7 @@
   "trigonometricFunctions": "Fonctions Trigonométriques",
   "applyPowerRule": "\\( \\frac{d}{df(x)} (f(x))^n \\)",
   "applyChainRule": "\\( \\frac{d}{dx} f(g(x)) \\)",
-  "applyProductRule": "\\( \\frac{d}{dx} f(x)g(x) \\)",
+  "applyProductRule": "\\( \\frac{d}{dx} f(x) \\cdot g(x) \\)",
   "applyQuotientRule": "\\( \\frac{d}{dx} \\frac{f(x)}{g(x)} \\)",
   "applyLinearityRule": "\\( \\frac{d}{dx} af(x) + bg(x) \\)",
   "exponentialFunction": "Fonction Exponentielles",

@@ -31,11 +31,16 @@ export function calculateDerivative(func, rule) {
 }
 
 function applyPowerRule(func) {
-    const powerRuleRegex = /^\\frac{d}{dx}\s*\{?\s*x\s*\}?\s*(\^{\d+})?\s*$/;
-
-    return func.replace(powerRuleRegex, (match, exp) => {
-        const exponent = exp ? parseInt(exp.replace(/[\^\{\}]/g, '')) : 1;
-        const newCoefficient = exponent;
+    const powerRuleRegex = /^\\frac{d}{dx}\s*\\left\((.*?)x(\^{?\d+}?)?\\right\)$/;
+    return func.replace(powerRuleRegex, (match, coefficient, exp) => {
+        const coeff = coefficient ? parseFloat(coefficient) || 1 : 1;
+        let exponent;
+        if (exp) {
+            exponent = exp.startsWith('^{') ? parseInt(exp.slice(2, -1)) : parseInt(exp.slice(1));
+        } else {
+            exponent = 1;
+        }
+        const newCoefficient = coeff * exponent;
         const newExponent = exponent - 1;
 
         if (newExponent === 0) {
@@ -49,11 +54,11 @@ function applyPowerRule(func) {
 }
 
 function applyProductRule(func) {
-    const productRuleRegex = /^\\frac{d}{dx}\s*\\left\((.*?)\\cdot(.*?)\\right\)$/;
+    const productRuleRegex = /^\\frac{d}{dx}\s*\\left\((.*?)(?:\\cdot|\*)(.*?)\\right\)$/;
     const match = func.match(productRuleRegex);
 
     if (!match) {
-        return func; // Return unchanged if it doesn't match the pattern
+        return func;
     }
 
     const [, u, v] = match;
@@ -62,29 +67,23 @@ function applyProductRule(func) {
 }
 
 function applyChainRule(func) {
-    const chainRuleRegex = /^\\frac{d}{dx}\s*\{\s*(\w+)\((.*?)\)\s*\}$/;
+    const chainRuleRegex = /^\\frac{d}{dx}\s*\\left\((\w+)\\left\((.*?)\\right\)\\right\)$/;
     return func.replace(chainRuleRegex, (_, outerFunc, innerFunc) => {
-        return `\\frac{d}{d${outerFunc}} {${outerFunc}(${innerFunc})} \\cdot \\frac{d}{dx}{${innerFunc}}`;
+        return `\\frac{d}{d${outerFunc}} \\left(${outerFunc}\\left(${innerFunc}\\right)\\right) \\cdot \\frac{d}{dx}\\left(${innerFunc}\\right)`;
     });
 }
 
 function applyQuotientRule(func) {
-    const quotientRuleRegex = /^\\frac{d}{dx}\s*\{\s*\\frac{(.*?)}{(.*?)}\s*\}$/;
+    const quotientRuleRegex = /^\\frac{d}{dx}\s*\\left\(\\frac{(.*?)}{(.*?)}\\right\)$/;
     const match = func.match(quotientRuleRegex);
 
     if (!match) {
-        // If it doesn't match the {d/dx}{frac{...}{...}} pattern, try without the outer braces
-        const simpleQuotientRuleRegex = /^\\frac{d}{dx}\s*\\frac{(.*?)}{(.*?)}$/;
-        const simpleMatch = func.match(simpleQuotientRuleRegex);
-        if (!simpleMatch) {
-            return func; // Return unchanged if it doesn't match either pattern
-        }
-        match = simpleMatch;
+        return func;
     }
 
     const [, numerator, denominator] = match;
 
-    return `\\frac{${denominator} \\cdot \\frac{d}{dx}{${numerator}} - ${numerator} \\cdot \\frac{d}{dx}{${denominator}}}{{(${denominator})}^{2}}`;
+    return `\\frac{${denominator} \\cdot \\frac{d}{dx}\\left(${numerator}\\right) - ${numerator} \\cdot \\frac{d}{dx}\\left(${denominator}\\right)}{{\\left(${denominator}\\right)}^{2}}`;
 }
 
 function applyLinearityRule(func) {
