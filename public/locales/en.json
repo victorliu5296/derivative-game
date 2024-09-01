@@ -12,7 +12,7 @@
   "applyLinearityRule": "\\(af(x) + bg(x)\\)",
   "exponentialFunction": "Exponential Functions",
   "logarithmicFunction": "Logarithmic Functions",
-  "rewriteTrigonometricFunctions": "Rewrite Reciprocal Trig: \\(\\csc\\), \\(\\sec\\), \\(\\cot\\)",
+  "rewriteRecipTrigFunctions": "Rewrite Reciprocal Trigonometric Functions: \\(\\csc\\), \\(\\sec\\), \\(\\cot\\)",
   "sineFunction": "\\(\\sin\\)",
   "cosineFunction": "\\(\\cos\\)",
   "tangentFunction": "\\(\\tan\\)",

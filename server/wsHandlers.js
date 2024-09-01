@@ -15,16 +15,19 @@ export function handleWebSocketConnection(ws) {
         }
 
         if (data.type === 'applyRule' && currentRoom) {
+            console.log("Received rule application request: " + data.rule);
             const roomData = rooms[currentRoom];
             const result = calculateDerivative(roomData.currentExpression, data.rule);
 
             if (result.error) {
+                console.log("Rule application error: " + result.error);
                 ws.send(JSON.stringify({
                     type: 'ruleApplicationError',
                     result: result.error
                 }));
             } else {
                 updateCurrentExpression(currentRoom, result.toString());
+                console.log("Sending new expression: " + result.toString());
                 ws.send(JSON.stringify({
                     type: 'newExpression',
                     expression: result.toString()

@@ -1,5 +1,5 @@
 import { updateLanguage } from './translations.js';
-import { setupRuleButtons, setupFunctionDerivativeButtons } from './ui.js';
+import { setupRuleButtons, setupFunctionDerivativeButtons, setupReciprocalTrigButton } from './ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Set default language and initialize the language setting
@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set up buttons using functions from ui.js
     setupRuleButtons();
     setupFunctionDerivativeButtons();
+    setupReciprocalTrigButton();
 
     // Language switcher buttons
     document.getElementById('langEn').addEventListener('click', () => updateLanguage('en'));

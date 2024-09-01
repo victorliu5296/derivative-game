@@ -27,7 +27,7 @@ export async function updateLanguage(language) {
     document.getElementById('exponentialFunctionButton').textContent = translations.exponentialFunction;
     document.getElementById('logarithmicFunctionButton').textContent = translations.logarithmicFunction;
 
-    document.getElementById('rewriteTrigonometricFunctionsButton').textContent = translations.rewriteTrigonometricFunctions;
+    document.getElementById('rewriteRecipTrigFunctionsButton').textContent = translations.rewriteRecipTrigFunctions;
     document.getElementById('sineFunctionButton').textContent = translations.sineFunction;
     document.getElementById('cosineFunctionButton').textContent = translations.cosineFunction;
     document.getElementById('tangentFunctionButton').textContent = translations.tangentFunction;

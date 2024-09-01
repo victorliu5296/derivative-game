@@ -49,6 +49,18 @@ export function setupFunctionDerivativeButtons() {
     });
 }
 
+export function setupReciprocalTrigButton() {
+    const rewriteRecipTrigFunctionsButton = document.getElementById('rewriteRecipTrigFunctionsButton');
+    if (rewriteRecipTrigFunctionsButton) {
+        rewriteRecipTrigFunctionsButton.addEventListener('click', () => {
+            socket.send(JSON.stringify({
+                type: 'rewriteRecipTrigFunctions'
+            }));
+            console.log('Rewrite Reciprocal Trigonometric Functions clicked');
+        });
+    }
+}
+
 export function renderWithAnimation(elementId, latexString) {
     const element = document.getElementById(elementId);
 

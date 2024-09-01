@@ -22,58 +22,47 @@ export function calculateDerivative(func, rule) {
     }
 }
 
+// Match and apply power rule
 function applyPowerRule(func) {
-    return math.derivative(func, 'x');
+    const powerRuleRegex = /([+-]?\d*)x\^(\d+)/g;
+    return func.replace(powerRuleRegex, (_, coef, exp) => {
+        const coefficient = coef ? parseInt(coef) : 1;
+        const exponent = parseInt(exp);
+        const newCoefficient = coefficient * exponent;
+        const newExponent = exponent - 1;
+        if (newExponent === 0) return `${newCoefficient}`;
+        if (newExponent === 1) return `${newCoefficient}x`;
+        return `${newCoefficient}x^{${newExponent}}`;
+    });
 }
 
+// Match and apply product rule
 function applyProductRule(func) {
-    const [u, v] = parseProductRule(func);
-    if (!u || !v) return null;
-    return math.derivative(u, 'x').multiply(v).add(u.multiply(math.derivative(v, 'x')));
+    const productRuleRegex = /(\w+)\((.*?)\)\s*\*\s*(\w+)\((.*?)\)/g;
+    return func.replace(productRuleRegex, (_, u, uInner, v, vInner) => {
+        return `\\frac{d}{dx}(${u}(${uInner})) \\cdot ${v}(${vInner}) + ${u}(${uInner}) \\cdot \\frac{d}{dx}(${v}(${vInner}))`;
+    });
 }
 
+// Match and apply chain rule
 function applyChainRule(func) {
-    const [outerFunc, innerFunc] = parseChainRule(func);
-    if (!outerFunc || !innerFunc) return null;
-    return math.derivative(outerFunc, 'x').evaluate({ x: innerFunc }).multiply(math.derivative(innerFunc, 'x'));
+    const chainRuleRegex = /(\w+)\((.*?)\)/g;
+    return func.replace(chainRuleRegex, (_, outerFunc, innerFunc) => {
+        return `\\frac{d}{dx}(${outerFunc}(${innerFunc})) \\cdot \\frac{d}{dx}(${innerFunc})`;
+    });
 }
 
+// Match and apply quotient rule
 function applyQuotientRule(func) {
-    const [u, v] = parseQuotientRule(func);
-    if (!u || !v) return null;
-    const numerator = math.derivative(u, 'x').multiply(v).subtract(u.multiply(math.derivative(v, 'x')));
-    const denominator = math.square(v);
-    return numerator.divide(denominator);
+    const quotientRuleRegex = /(\w+)\((.*?)\)\s*\/\s*(\w+)\((.*?)\)/g;
+    return func.replace(quotientRuleRegex, (_, u, uInner, v, vInner) => {
+        return `\\frac{${v}(${vInner}) \\cdot \\frac{d}{dx}(${u}(${uInner})) - ${u}(${uInner}) \\cdot \\frac{d}{dx}(${v}(${vInner}))}{(${v}(${vInner}))^2}`;
+    });
 }
 
+// Handle the linearity rule
 function applyLinearityRule(func) {
-    return math.derivative(func, 'x');
-}
-
-// Helper functions to parse the expressions for product, chain, and quotient rules
-
-function parseProductRule(func) {
-    const expr = math.parse(func);
-    if (expr.type === 'OperatorNode' && expr.op === '*') {
-        return [expr.args[0], expr.args[1]];
-    }
-    return [null, null]; // Return nulls if the function is not a product
-}
-
-function parseChainRule(func) {
-    const expr = math.parse(func);
-    if (expr.type === 'FunctionNode') {
-        const innerFunc = expr.args[0];
-        const outerFunc = math.parse(`${expr.name}(x)`);
-        return [outerFunc, innerFunc];
-    }
-    return [null, null]; // Return nulls if the function is not in the form of f(g(x))
-}
-
-function parseQuotientRule(func) {
-    const expr = math.parse(func);
-    if (expr.type === 'OperatorNode' && expr.op === '/') {
-        return [expr.args[0], expr.args[1]];
-    }
-    return [null, null]; // Return nulls if the function is not a quotient
+    const terms = func.split('+').map(term => term.trim());
+    const derivatives = terms.map(term => `\\frac{d}{dx}(${term})`);
+    return derivatives.join(' + ');
 }
