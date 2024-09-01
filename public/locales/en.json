@@ -5,7 +5,7 @@
   "functionDerivatives": "Function Derivatives:",
   "exponentialAndLogarithmic": "Exponential & Logarithmic Functions",
   "trigonometricFunctions": "Trigonometric Functions",
-  "applyPowerRule": "\\( \\frac{d}{d.} (.)^n \\)",
+  "applyPowerRule": "\\( \\frac{d}{df(x)} (f(x))^n \\)",
   "applyChainRule": "\\( \\frac{d}{dx} f(g(x)) \\)",
   "applyProductRule": "\\( \\frac{d}{dx} f(x)g(x) \\)",
   "applyQuotientRule": "\\( \\frac{d}{dx} \\frac{f(x)}{g(x)} \\)",
