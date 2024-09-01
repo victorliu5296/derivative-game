@@ -70,49 +70,63 @@ function applyQuotientRule(func) {
 }
 
 function applyLinearityRule(func) {
-    // This function should extract terms correctly, including handling parenthetical expressions
-    const terms = splitIntoTermsRespectingParentheses(func);
+    // Match the entire derivative expression and extract the inner content
+    const derivativeExpressionRegex = /^\\frac{d}{dx}\s*\\left\((.*?)\\right\)$/;
+    const match = func.match(derivativeExpressionRegex);
 
-    // If no terms are found, return an error
-    if (!terms || terms.length === 0) {
-        return { error: `No terms found in the expression: ${func}` };
+    if (!match) {
+        return func; // Return unchanged if it doesn't match the pattern
     }
 
-    // Apply the derivative to each term
-    const derivatives = terms.map(term => `\\frac{d}{dx}{${term.trim()}}`);
+    const innerExpression = match[1];
 
-    // Join the derived terms into a single expression, ensuring correct handling of signs
-    return derivatives.join(' + ').replace(/\+\s*-/g, '- ');
+    // Split the inner expression into terms
+    const terms = innerExpression.split(/(?=[+-])/);
+
+    // Apply the derivative to each term
+    const derivatives = terms.map(term => {
+        term = term.trim();
+        const sign = term.startsWith('+') || term.startsWith('-') ? term[0] : '';
+        const cleanTerm = sign ? term.slice(1).trim() : term;
+
+        // Check for scalar multiplication
+        const scalarMatch = cleanTerm.match(/^(\d+|\d*\.\d+)(.+)$/);
+        if (scalarMatch) {
+            const [, scalar, rest] = scalarMatch;
+            return `${sign}${scalar}\\frac{d}{dx}{${rest}}`;
+        } else {
+            return `${sign}\\frac{d}{dx}{${cleanTerm}}`;
+        }
+    });
+
+    // Join the derived terms into a single expression
+    return derivatives.join(' ');
 }
 
-function splitIntoTermsRespectingParentheses(expression) {
+function splitTermsRespectingParentheses(expression) {
     const terms = [];
     let currentTerm = '';
-    let openParens = 0;
+    let openParentheses = 0;
 
     for (let i = 0; i < expression.length; i++) {
         const char = expression[i];
 
         if (char === '(') {
-            openParens += 1;
+            openParentheses++;
         } else if (char === ')') {
-            openParens -= 1;
+            openParentheses--;
         }
 
-        // If we encounter a + or - at the top level (outside of parentheses), split here
-        if ((char === '+' || char === '-') && openParens === 0) {
-            if (currentTerm.trim()) {
-                terms.push(currentTerm.trim());
-            }
-            currentTerm = char; // Start the new term with the current operator
+        if ((char === '+' || char === '-') && openParentheses === 0 && currentTerm.trim() !== '') {
+            terms.push(currentTerm);
+            currentTerm = char; // Start a new term with the current sign
         } else {
             currentTerm += char;
         }
     }
 
-    // Push the last term
-    if (currentTerm.trim()) {
-        terms.push(currentTerm.trim());
+    if (currentTerm.trim() !== '') {
+        terms.push(currentTerm);
     }
 
     return terms;
