@@ -64,41 +64,27 @@ export function applyQuotientRule(expr) {
 }
 
 export function applyChainRule(expr) {
-    console.log('Expression:', JSON.stringify(expr, null, 2));
-
     if (expr.type !== 'derivative' || expr.expression.type !== 'function') {
         return expr;
     }
 
-    console.log('Applying Chain Rule');
+    const outerFunction = expr.expression;
     const innerFunction = expr.expression.argument;
-    const outerFunction = expr.expression.name;
-    let outerDerivative;
 
-    switch (outerFunction) {
-        case 'sin':
-            outerDerivative = createFunction('cos', innerFunction);
-            break;
-        case 'cos':
-            outerDerivative = createBinaryOp('*', createConstant(-1), createFunction('sin', innerFunction));
-            break;
-        case 'tan':
-            outerDerivative = createBinaryOp('+', createConstant(1), createBinaryOp('^', createFunction('tan', innerFunction), createConstant(2)));
-            break;
-        case 'ln':
-            outerDerivative = createBinaryOp('/', createConstant(1), innerFunction);
-            break;
-        case 'exp':
-            outerDerivative = createFunction('exp', innerFunction);
-            break;
-        default:
-            return expr;
+    // Check if the differentiation variable matches the function argument
+    if (JSON.stringify(expr.variable) !== JSON.stringify(innerFunction)) {
+        // Apply the chain rule
+        return createBinaryOp('*',
+            createDerivative(
+                outerFunction,
+                innerFunction
+            ),
+            createDerivative(innerFunction, expr.variable)
+        );
     }
 
-    return createBinaryOp('*',
-        outerDerivative,
-        createDerivative(innerFunction, expr.variable)
-    );
+    // If the variables don't match, don't apply the rule
+    return expr;
 }
 
 export function applyLinearityRule(expr) {

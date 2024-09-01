@@ -25,5 +25,5 @@ export function generateRandomFunction(minTerms = 2, maxTerms = 4, maxDepth = 2)
         expression = createBinaryOp(operator, expression, generateTerm());
     }
 
-    return createDerivative(expression);
+    return createDerivative(expression, createVariable('x'));
 }

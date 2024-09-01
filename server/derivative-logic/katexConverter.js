@@ -9,9 +9,21 @@ export function toKaTeX(expr, parentOp = null) {
         case 'function':
             return `\\${expr.name}\\left(${toKaTeX(expr.argument)}\\right)`;
         case 'derivative':
-            return `\\frac{d}{dx}\\left(${toKaTeX(expr.expression)}\\right)`;
+            return formatDerivative(expr);
         default:
             throw new Error('Unknown expression type');
+    }
+}
+
+function formatDerivative(expr) {
+    if (expr.variable && expr.variable.type === 'function') {
+        // This is for cases like d/d(6x) sin(6x)
+        return `\\frac{d}{d\\left(${toKaTeX(expr.variable)}\\right)}${toKaTeX(expr.expression)}`;
+    } else {
+        // General case
+        const variable = expr.variable ? toKaTeX(expr.variable) : 'x';
+        const wrappedVariable = variable === 'x' ? 'x' : `\\left(${variable}\\right)`;
+        return `\\frac{d}{d${wrappedVariable}}\\left(${toKaTeX(expr.expression)}\\right)`;
     }
 }
 
