@@ -17,7 +17,7 @@ export function handleWebSocketConnection(ws) {
         if (data.type === 'applyRule' && currentRoom) {
             console.log("Received rule application request: " + data.rule);
             const roomData = rooms[currentRoom];
-            const result = calculateDerivative(roomData.currentExpression, data.rule);
+            const result = calculateDerivative(roomData.currentKatexExpression, data.rule);
 
             if (result.error) {
                 console.log("Rule application error: " + result.error);

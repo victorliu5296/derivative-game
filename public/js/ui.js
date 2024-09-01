@@ -74,7 +74,6 @@ export function renderWithAnimation(elementId, latexString) {
     // Remove the previous animation class if it's already there
     element.classList.remove('animate');
 
-    latexString = formatForRendering(math.parse(latexString).toTex());
     // Render the LaTeX using KaTeX
     katex.render(latexString, element, {
         throwOnError: false
@@ -87,18 +86,6 @@ export function renderWithAnimation(elementId, latexString) {
     element.classList.add('animate');
 }
 
-function formatForRendering(latex) {
-    // Remove unnecessary multiplication by 1
-    latex = latex.replace(/\b1\\cdot\s*/g, '');
-
-    // Remove \cdot between a number and a function or expression in curly braces, including sin, cos, e^x
-    latex = latex.replace(/(\d+)\\cdot\s*(\\?[\w{}^]+)/g, '$1$2');
-
-    // Remove identity power operations like x^1 or {x}^{1}
-    latex = latex.replace(/(\{?\w+\}?)(\^{\s*1\s*})/g, '$1');
-
-    return latex;
-}
 
 export function displayMessage(message) {
     const messagesElement = document.getElementById('messages');

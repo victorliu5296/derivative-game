@@ -1,3 +1,5 @@
+import * as math from 'mathjs';
+
 export function generateRandomFunction() {
     const numTerms = Math.floor(Math.random() * 3) + 2; // 2 to 4 terms
     const terms = [];
@@ -41,5 +43,18 @@ export function generateRandomFunction() {
         }
     }
 
-    return terms.join(' + ').replace(/\+ -/g, '- ');
+    return formatForRendering(math.parse(terms.join(' + ').replace(/\+ -/g, '- ')).toTex());
+}
+
+function formatForRendering(latex) {
+    // Remove unnecessary multiplication by 1
+    latex = latex.replace(/\b1\\cdot\s*/g, '');
+
+    // Remove \cdot between a number and a function or expression in curly braces, including sin, cos, e^x
+    latex = latex.replace(/(\d+)\\cdot\s*(\\?[\w{}^]+)/g, '$1$2');
+
+    // Remove identity power operations like x^1 or {x}^{1}
+    latex = latex.replace(/(\{?\w+\}?)(\^{\s*1\s*})/g, '$1');
+
+    return latex;
 }
