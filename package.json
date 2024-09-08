@@ -4,6 +4,9 @@
   "description": "A simple derivative math game in JavaScript using WebSockets",
   "type": "module",
   "main": "server.js",
+  "engines": {
+    "node": ">=16"
+  },
   "dependencies": {
     "express": "^4.19.2",
     "mathjs": "^13.1.1",
