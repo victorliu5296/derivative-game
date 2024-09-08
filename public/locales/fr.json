@@ -1,6 +1,7 @@
 {
   "title": "Jeu mathématique de dérivées",
   "currentFunction": "Fonction actuelle :",
+  "simplifyButton": "Simplifier l'expression",
   "derivativeRules": "Règles de Dérivation :",
   "functionDerivatives": "Dérivées de Fonctions :",
   "exponentialAndLogarithmic": "Fonctions Exponentielles et Logarithmiques",
@@ -20,5 +21,6 @@
   "inverseCosineFunction": "\\(\\cos^{-1}\\)",
   "inverseTangentFunction": "\\(\\tan^{-1}\\)",
   "connected": "Connecté au serveur !",
-  "disconnected": "Déconnecté du serveur"
+  "disconnected": "Déconnecté du serveur",
+  "simplificationAlreadyApplied": "La simplification a déjà été appliquée"
 }

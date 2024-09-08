@@ -34,15 +34,21 @@ socket.onerror = function (error) {
 socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
-    if (data.type === 'newExpression') {
-        if (data.expression && data.expression.error) {
-            triggerErrorAnimation('currentExpression', data.expression.error);
-        } else {
-            renderWithAnimation('currentExpression', data.expression);
-        }
-    }
-
-    if (data.type === 'message') {
-        displayMessage(data.message);
+    switch (data.type) {
+        case 'newExpression':
+            if (data.expression && data.expression.error) {
+                triggerErrorAnimation('currentExpression', data.expression.error);
+            } else {
+                renderWithAnimation('currentExpression', data.expression);
+            }
+            break;
+        case 'message':
+            displayMessage(data.message);
+            break;
+        case 'simplificationStatus':
+            if (data.status === 'alreadyApplied') {
+                triggerErrorAnimation('simplifyButton', "Simplification already applied");
+            }
+            break;
     }
 };

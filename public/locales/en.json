@@ -1,6 +1,7 @@
 {
   "title": "Derivative Math Game",
   "currentFunction": "Current Function:",
+  "simplifyButton": "Simplify Expression",
   "derivativeRules": "Derivative Rules:",
   "functionDerivatives": "Function Derivatives:",
   "exponentialAndLogarithmic": "Exponential & Logarithmic Functions",
@@ -20,5 +21,6 @@
   "inverseCosineFunction": "\\(\\cos^{-1}\\)",
   "inverseTangentFunction": "\\(\\tan^{-1}\\)",
   "connected": "Connected to the server!",
-  "disconnected": "Disconnected from the server"
+  "disconnected": "Disconnected from the server",
+  "simplificationAlreadyApplied": "Simplification has already been applied"
 }

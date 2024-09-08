@@ -1,6 +1,26 @@
 import { socket } from './websocket.js';
 
-export function setupRuleButtons() {
+export function initializeUI() {
+    setupRuleButtons();
+    setupFunctionDerivativeButtons();
+    setupReciprocalTrigButton();
+    setupSimplifyButton();
+}
+
+function setupSimplifyButton() {
+    const simplifyButton = document.getElementById('simplifyButton');
+    if (!simplifyButton) {
+        return;
+    }
+    simplifyButton.addEventListener('click', () => {
+        socket.send(JSON.stringify({
+            type: 'simplify'
+        }));
+        console.log('Simplify button clicked');
+    });
+}
+
+function setupRuleButtons() {
     const ruleButtons = [
         { id: 'powerRuleButton', rule: 'power' },
         { id: 'productRuleButton', rule: 'product' },
@@ -23,7 +43,7 @@ export function setupRuleButtons() {
     });
 }
 
-export function setupFunctionDerivativeButtons() {
+function setupFunctionDerivativeButtons() {
     const derivativeButtons = [
         { id: 'exponentialFunctionButton', rule: 'exponential' },
         { id: 'logarithmicFunctionButton', rule: 'logarithmic' },
@@ -49,7 +69,7 @@ export function setupFunctionDerivativeButtons() {
     });
 }
 
-export function setupReciprocalTrigButton() {
+function setupReciprocalTrigButton() {
     const rewriteRecipTrigFunctionsButton = document.getElementById('rewriteRecipTrigFunctionsButton');
     if (rewriteRecipTrigFunctionsButton) {
         rewriteRecipTrigFunctionsButton.addEventListener('click', () => {
@@ -85,7 +105,6 @@ export function renderWithAnimation(elementId, latexString) {
     // Add the animation class to trigger the fade-in and scale-up animation
     element.classList.add('animate');
 }
-
 
 export function displayMessage(message) {
     const messagesElement = document.getElementById('messages');

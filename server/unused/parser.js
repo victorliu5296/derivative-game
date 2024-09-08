@@ -1,4 +1,4 @@
-import { createConstant, createVariable, createBinaryOp, createFunction, createDerivative } from './expressionStructure.js';
+import { createConstant, createVariable, createBinaryOp, createFunction, createDerivative } from '../derivative-logic/expressionStructure.js';
 
 export function parse(expression) {
     const tokens = tokenize(expression);
