@@ -13,6 +13,8 @@ export async function updateLanguage(language) {
     document.querySelector('h1').textContent = translations.title;
     document.querySelector('h2').textContent = translations.currentFunction;
 
+    document.getElementById('simplifyButton').textContent = translations.simplifyButton;
+
     // Update derivative rule buttons
     document.getElementById('powerRuleButton').textContent = translations.applyPowerRule;
     document.getElementById('productRuleButton').textContent = translations.applyProductRule;
