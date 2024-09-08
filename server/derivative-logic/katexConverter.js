@@ -1,4 +1,8 @@
 export function toKaTeX(expr, parentOp = null) {
+    if (!expr) {
+        console.error('Received null or undefined node in toKaTeX');
+        return '';
+    }
     switch (expr.type) {
         case 'constant':
             return expr.value.toString();
@@ -28,6 +32,12 @@ function formatDerivative(expr) {
 }
 
 function formatBinaryOperation(expr, parentOp) {
+    const left = toKaTeX(expr.left);
+    const right = toKaTeX(expr.right);
+    if (!left || !right) {
+        console.error('Invalid binary operation in toKaTeX');
+        return '';
+    }
     let result;
     switch (expr.operator) {
         case '+':

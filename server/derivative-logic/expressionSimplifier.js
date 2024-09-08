@@ -26,10 +26,17 @@ function treeToMathjs(node) {
 }
 
 // Parse mathjs expression back to your nested object structure
-function mathjsToTree(expr) {
+function mathjsToTree(expression) {
     try {
-        const node = math.parse(expr);
-        return convertNode(node);
+        let parsedExpression;
+        if (typeof expression === 'string') {
+            parsedExpression = math.parse(expression);
+        } else if (expression.toString && typeof expression.toString === 'function') {
+            parsedExpression = math.parse(expression.toString());
+        } else {
+            throw new Error('Invalid expression type in mathjsToTree');
+        }
+        return convertNode(parsedExpression);
     } catch (error) {
         console.error('Error in mathjsToTree:', error);
         return null;
@@ -38,7 +45,7 @@ function mathjsToTree(expr) {
 
 function convertNode(node) {
     if (!node) {
-        console.error('Received undefined node in convertNode: ' + JSON.stringify(node));
+        console.error('Received undefined node in convertNode');
         return null;
     }
     try {
@@ -48,6 +55,12 @@ function convertNode(node) {
             case 'SymbolNode':
                 return createVariable(node.name);
             case 'OperatorNode':
+                if (node.fn === 'unaryMinus') {
+                    return createBinaryOp('*', createConstant(-1), convertNode(node.args[0]));
+                }
+                if (node.args.length === 1) {
+                    return createFunction(node.fn, convertNode(node.args[0]));
+                }
                 return createBinaryOp(
                     node.op,
                     convertNode(node.args[0]),
@@ -75,6 +88,7 @@ function convertNode(node) {
 
 // Check if a subtree contains a derivative node
 function containsDerivative(node) {
+    if (!node) return false;
     if (node.type === 'derivative') return true;
     if (node.type === 'binary') {
         return containsDerivative(node.left) || containsDerivative(node.right);
@@ -85,23 +99,35 @@ function containsDerivative(node) {
     return false;
 }
 
+const simplificationRules = [
+    { l: "n1/n2/n3", r: "n1/(n2*n3)", repeat: true },
+    { l: "n1/n2*n3", r: "(n1*n3)/n2" },
+]
+
 function simplifySubExpression(node) {
-    if (containsDerivative(node)) {
-        return node;
+    if (node.type === 'derivative') {
+        const simplifiedInner = simplifySubExpression(node.expression);
+        return createDerivative(simplifiedInner, node.variable);
     }
     try {
         const mathjsExpr = treeToMathjs(node);
-        console.log('mathjs expression:', mathjsExpr);
-        const simplified = math.simplify(mathjsExpr).toString();
-        console.log('simplified expression:', simplified);
-        return mathjsToTree(simplified);
+        console.log('mathjs expression to simplify:', mathjsExpr);
+        const simplified1 = math.simplify(mathjsExpr);
+        const simplified2 = math.simplify(simplified1, simplificationRules);
+        console.log('simplified expression as string:', math.string(simplified2));
+        const result = mathjsToTree(simplified2);
+        if (!result) {
+            console.error('mathjsToTree returned null, falling back to original node');
+            return node;
+        }
+        return result;
     } catch (error) {
         console.error('Error in simplifySubExpression:', error);
         return node;
     }
 }
 
-function simplifyExpressionTree(node) {
+function simplifyExpressionTree(node, isTopLevel = true) {
     if (!node) {
         console.error('Received undefined node in simplifyExpressionTree');
         return null;
@@ -112,14 +138,16 @@ function simplifyExpressionTree(node) {
             case 'variable':
                 return node;
             case 'binary':
-                const simplifiedLeft = simplifyExpressionTree(node.left);
-                const simplifiedRight = simplifyExpressionTree(node.right);
-                return simplifySubExpression(createBinaryOp(node.operator, simplifiedLeft, simplifiedRight));
+                const simplifiedLeft = simplifyExpressionTree(node.left, false);
+                const simplifiedRight = simplifyExpressionTree(node.right, false);
+                const newNode = createBinaryOp(node.operator, simplifiedLeft, simplifiedRight);
+                return isTopLevel ? simplifySubExpression(newNode) : newNode;
             case 'function':
-                const simplifiedArg = simplifyExpressionTree(node.argument);
-                return simplifySubExpression(createFunction(node.name, simplifiedArg));
+                const simplifiedArg = simplifyExpressionTree(node.argument, false);
+                const newFunc = createFunction(node.name, simplifiedArg);
+                return isTopLevel ? simplifySubExpression(newFunc) : newFunc;
             case 'derivative':
-                const simplifiedExpr = simplifyExpressionTree(node.expression);
+                const simplifiedExpr = simplifyExpressionTree(node.expression, true);
                 return createDerivative(simplifiedExpr, node.variable);
             default:
                 console.error('Unknown node type in simplifyExpressionTree:', node.type);
@@ -133,10 +161,13 @@ function simplifyExpressionTree(node) {
 
 export function simplifyExpression(node) {
     try {
-        console.log('Input node:', JSON.stringify(node, null, 2));
-        const simplifiedTree = simplifyExpressionTree(node);
-        console.log('Simplified tree:', JSON.stringify(simplifiedTree, null, 2));
-        const katexString = toKaTeX(simplifiedTree);
+        const simplifiedTree = simplifyExpressionTree(node, true);
+        if (!simplifiedTree) {
+            console.error('simplifyExpressionTree returned null');
+            return { expression: node, katex: toKaTeX(node) };
+        }
+        console.log('Simplified tree:', JSON.stringify(treeToMathjs(simplifiedTree), null, 2));
+        let katexString = toKaTeX(simplifiedTree);
         console.log('KaTeX string:', katexString);
         return {
             expression: simplifiedTree,
