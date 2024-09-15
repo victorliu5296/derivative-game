@@ -176,9 +176,12 @@ export function applyQuotientRule(expr) {
 }
 
 export function applyConstantRule(expr) {
+    console.log('Expression:', JSON.stringify(expr, null, 2));
+
     if (expr.type !== 'derivative' || expr.expression.type !== 'constant') {
         return expr;
     }
 
+    console.log('Applying Constant Rule');
     return createConstant(0);
 }

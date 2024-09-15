@@ -27,6 +27,7 @@ function setupRuleButtons() {
         { id: 'chainRuleButton', rule: 'chain' },
         { id: 'quotientRuleButton', rule: 'quotient' },
         { id: 'linearityRuleButton', rule: 'linearity' },
+        { id: 'constantRuleButton', rule: 'constant' },
     ];
 
     ruleButtons.forEach(({ id, rule }) => {
