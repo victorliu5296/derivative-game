@@ -24,17 +24,25 @@ export function applyLinearityRule(expr) {
             createDerivative(innerExpr.left, expr.variable),
             createDerivative(innerExpr.right, expr.variable)
         );
-    } else if (innerExpr.operator === '*') {
-        // For multiplication, check if one operand is a constant
-        if (innerExpr.left.type === 'constant') {
+    } else if (innerExpr.operator === '*' || innerExpr.operator === '/') {
+        // For multiplication and division, check if one operand is a constant
+        if (innerExpr.right.type === 'constant') {
+            if (innerExpr.operator === '*') {
+                return createBinaryOp('*',
+                    innerExpr.right,
+                    createDerivative(innerExpr.left, expr.variable)
+                );
+            } else { // division
+                return createBinaryOp('/',
+                    createDerivative(innerExpr.left, expr.variable),
+                    innerExpr.right
+                );
+            }
+        } else if (innerExpr.left.type === 'constant' && innerExpr.operator === '*') {
+            // Only for multiplication, as division by variable is not a linear operation
             return createBinaryOp('*',
                 innerExpr.left,
                 createDerivative(innerExpr.right, expr.variable)
-            );
-        } else if (innerExpr.right.type === 'constant') {
-            return createBinaryOp('*',
-                innerExpr.right,
-                createDerivative(innerExpr.left, expr.variable)
             );
         }
     }
