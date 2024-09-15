@@ -11,6 +11,7 @@
   "applyChainRule": "\\( \\frac{d}{dx} f(g(x)) \\)",
   "applyProductRule": "\\( \\frac{d}{dx} f(x) \\cdot g(x) \\)",
   "applyQuotientRule": "\\( \\frac{d}{dx} \\frac{f(x)}{g(x)} \\)",
+  "applyConstantRule": "\\( \\frac{d}{dx} af(x) \\)",
   "exponentialFunction": "Funciones Exponenciales",
   "logarithmicFunction": "Funciones Logaritmicas",
   "rewriteRecipTrigFunctions": "Reescribir Funciones Trig Inversas: \\(\\csc\\), \\(\\sec\\), \\(\\cot\\)",

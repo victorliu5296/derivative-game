@@ -18,9 +18,10 @@ export async function updateLanguage(language) {
     // Update derivative rule buttons
     document.getElementById('linearityRuleButton').textContent = translations.applyLinearityRule;
     document.getElementById('powerRuleButton').textContent = translations.applyPowerRule;
-    document.getElementById('productRuleButton').textContent = translations.applyProductRule;
     document.getElementById('chainRuleButton').textContent = translations.applyChainRule;
+    document.getElementById('productRuleButton').textContent = translations.applyProductRule;
     document.getElementById('quotientRuleButton').textContent = translations.applyQuotientRule;
+    document.getElementById('constantRuleButton').textContent = translations.applyConstantRule;
 
     // Update fieldset legends and function derivative buttons
     document.querySelector('fieldset legend').textContent = translations.exponentialAndLogarithmic;

@@ -17,11 +17,12 @@ export function initializeGame() {
 }
 
 const ruleMap = {
+    linearity: Rules.applyLinearityRule,
     power: Rules.applyPowerRule,
+    chain: Rules.applyChainRule,
     product: Rules.applyProductRule,
     quotient: Rules.applyQuotientRule,
-    chain: Rules.applyChainRule,
-    linearity: Rules.applyLinearityRule
+    constant: Rules.applyConstantRule,
 };
 
 export function applyDerivativeRule(expression, rule) {
