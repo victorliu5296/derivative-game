@@ -46,14 +46,14 @@ function setupRuleButtons() {
 
 function setupFunctionDerivativeButtons() {
     const derivativeButtons = [
-        { id: 'exponentialFunctionButton', rule: 'exponential' },
-        { id: 'logarithmicFunctionButton', rule: 'logarithmic' },
-        { id: 'sineFunctionButton', rule: 'sine' },
-        { id: 'cosineFunctionButton', rule: 'cosine' },
-        { id: 'tangentFunctionButton', rule: 'tangent' },
-        { id: 'inverseSineFunctionButton', rule: 'inverseSine' },
-        { id: 'inverseCosineFunctionButton', rule: 'inverseCosine' },
-        { id: 'inverseTangentFunctionButton', rule: 'inverseTangent' },
+        { id: 'exponentialFunctionButton', rule: 'exp' },
+        { id: 'logarithmicFunctionButton', rule: 'ln' },
+        { id: 'sineFunctionButton', rule: 'sin' },
+        { id: 'cosineFunctionButton', rule: 'cos' },
+        { id: 'tangentFunctionButton', rule: 'tan' },
+        { id: 'inverseSineFunctionButton', rule: 'arcsin' },
+        { id: 'inverseCosineFunctionButton', rule: 'arccos' },
+        { id: 'inverseTangentFunctionButton', rule: 'arctan' },
     ];
 
     derivativeButtons.forEach(({ id, rule }) => {

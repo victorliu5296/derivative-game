@@ -3,6 +3,7 @@
 import { generateRandomFunction } from './randomFunctionGenerator.js';
 import { toKaTeX } from './katexConverter.js';
 import * as Rules from './derivativeRules.js';
+import * as FunctionDerivatives from './functionDerivatives.js';
 
 export function initializeGame() {
     const randomFunc = generateRandomFunction();
@@ -23,6 +24,11 @@ const ruleMap = {
     product: Rules.applyProductRule,
     quotient: Rules.applyQuotientRule,
     constant: Rules.applyConstantRule,
+    exp: FunctionDerivatives.applyExpRule,
+    ln: FunctionDerivatives.applyLogRule,
+    sin: FunctionDerivatives.applySinRule,
+    cos: FunctionDerivatives.applyCosRule,
+    tan: FunctionDerivatives.applyTanRule,
 };
 
 export function applyDerivativeRule(expression, rule) {
