@@ -16,11 +16,11 @@ export async function updateLanguage(language) {
     document.getElementById('simplifyButton').textContent = translations.simplifyButton;
 
     // Update derivative rule buttons
+    document.getElementById('linearityRuleButton').textContent = translations.applyLinearityRule;
     document.getElementById('powerRuleButton').textContent = translations.applyPowerRule;
     document.getElementById('productRuleButton').textContent = translations.applyProductRule;
     document.getElementById('chainRuleButton').textContent = translations.applyChainRule;
     document.getElementById('quotientRuleButton').textContent = translations.applyQuotientRule;
-    document.getElementById('linearityRuleButton').textContent = translations.applyLinearityRule;
 
     // Update fieldset legends and function derivative buttons
     document.querySelector('fieldset legend').textContent = translations.exponentialAndLogarithmic;
