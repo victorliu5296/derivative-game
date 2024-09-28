@@ -8,7 +8,7 @@
     "node": ">=16"
   },
   "dependencies": {
-    "express": "^4.19.2",
+    "express": "^4.21.0",
     "mathjs": "^13.1.1",
     "ws": "^8.18.0"
   },
