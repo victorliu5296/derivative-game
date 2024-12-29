@@ -16,6 +16,7 @@ export async function updateLanguage(language) {
     document.getElementById('simplifyButton').textContent = translations.simplifyButton;
 
     // Update derivative rule buttons
+    document.getElementById('derivativeRulesTitle').textContent = translations.derivativeRules;
     document.getElementById('linearityRuleButton').textContent = translations.applyLinearityRule;
     document.getElementById('powerRuleButton').textContent = translations.applyPowerRule;
     document.getElementById('chainRuleButton').textContent = translations.applyChainRule;
@@ -27,6 +28,7 @@ export async function updateLanguage(language) {
     document.querySelector('fieldset legend').textContent = translations.exponentialAndLogarithmic;
     document.querySelector('fieldset:nth-of-type(2) legend').textContent = translations.trigonometricFunctions;
 
+    document.getElementById('functionDerivativesTitle').textContent = translations.functionDerivatives;
     document.getElementById('exponentialFunctionButton').textContent = translations.exponentialFunction;
     document.getElementById('logarithmicFunctionButton').textContent = translations.logarithmicFunction;
 
