@@ -53,3 +53,198 @@
     color: red;
     /* Optional: Change text color to red during the error */
 }
+
+:root {
+    --primary-color: #004958;
+    --secondary-color: #00c2cb;
+    --text-color: #42455a;
+    --hover-color: #e0ffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f5f5f5;
+    color: var(--text-color);
+}
+
+h1,
+h2,
+h3 {
+    color: var(--primary-color);
+}
+
+fieldset {
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    margin: 15px 0;
+    padding: 20px;
+}
+
+legend {
+    color: var(--primary-color);
+    font-weight: 600;
+    padding: 0 10px;
+}
+
+button {
+    position: relative;
+    padding: 12px 24px;
+    margin: 8px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-color);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect */
+button:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow-color);
+}
+
+/* Click Animation */
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px var(--shadow-color);
+}
+
+/* Ripple Effect */
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease-out, height 0.3s ease-out;
+}
+
+button:active::after {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+}
+
+#languageSwitcher {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#languageSwitcher button {
+    padding: 8px 16px;
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+#derivativeRules,
+#functionDerivativeButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+#trigonometricFunctionsButtons,
+#inverseTrigonometricFunctionsButtons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.fade-scale-in {
+    animation: fadeScaleIn 0.3s ease-out;
+}
+
+@keyframes fadeScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* For messages */
+#messages {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Current Expression Container Styles */
+#currentExpression {
+    width: 100%;
+    text-align: center;
+    font-size: 2em;
+    /* Increase font size */
+    margin: 30px 0;
+    padding: 20px;
+    background-color: white;
+    /* Optional: adds a white background */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    /* Optional: adds subtle shadow */
+    border-radius: var(--border-radius);
+    min-height: 100px;
+    /* Ensures minimum height even when empty */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container for the expression section */
+#currentExpression-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+/* Style for the heading above the expression */
+#currentExpression-container h2 {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+/* Ensure KaTeX renders properly in centered container */
+.katex-display {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 0;
+}
