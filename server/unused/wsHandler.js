@@ -1,5 +1,5 @@
 import { joinRoom, leaveRoom, broadcastToRoom, updateGameState, resetRoomState } from './roomManager.js';
-import { applyRuleToGameState } from './gameState.js';
+import { applyRuleToGameState } from '../gameState.js';
 
 export function handleWebSocketConnection(ws) {
     let currentRoom = null;

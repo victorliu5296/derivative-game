@@ -1,7 +1,7 @@
-import { generateRandomFunction } from './randomFunctionGenerator.js';
-import { toKaTeX } from './toKaTeX.js';
-import * as Rules from './rules.js';
-import { isFullyDifferentiated } from './expressionSimplifier.js';
+import { generateRandomFunction } from '../randomFunctionGenerator.js';
+import { toKaTeX } from '../toKaTeX.js';
+import * as Rules from '../rules.js';
+import { isFullyDifferentiated } from '../expressionSimplifier.js';
 
 const gameStates = {};
 

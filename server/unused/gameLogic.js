@@ -1,8 +1,8 @@
-import { generateRandomFunction } from './randomFunctionGenerator.js';
-import { toKaTeX } from './toKaTeX.js';
-import * as Rules from './derivativeRules.js';
-import * as FunctionDerivatives from './functionDerivatives.js';
-import { simplifyExpression } from './expressionSimplifier.js';
+import { generateRandomFunction } from '../randomFunctionGenerator.js';
+import { toKaTeX } from '../toKaTeX.js';
+import * as Rules from '../derivativeRules.js';
+import * as FunctionDerivatives from '../functionDerivatives.js';
+import { simplifyExpression } from '../expressionSimplifier.js';
 
 export function initializeGame(difficulty = 'medium') {
     const randomFunc = generateRandomFunction();
