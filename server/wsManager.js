@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { initializeGameState, applyRuleToGameState, resetGameState, getGameState } from './unused/gameEngine.js';
+import { initializeGameState, applyRuleToGameState, resetGameState, getGameState } from './gameEngine.js';
 import { gameConfig } from '../public/config/gameConfig.js';
 
 const rooms = {};
