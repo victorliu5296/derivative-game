@@ -1,15 +1,15 @@
-// roomManager.js
-
-import WebSocket from 'ws';  // Add this import at the top of the file
+import WebSocket from 'ws';
 import { initializeGame } from './derivative-logic/gameLogic.js';
+import { getDifficultySettings } from './derivative-logic/difficultySettings.js';
 
 const rooms = {}; // Keeps track of rooms and their states
 
-export function joinRoom(ws, room) {
+export function joinRoom(ws, room, difficulty = 'medium') {
     if (!rooms[room]) {
         rooms[room] = {
             clients: [],
-            gameState: initializeGame()
+            gameState: initializeGame(getDifficultySettings(difficulty)),
+            difficulty: difficulty
         };
     }
 
@@ -32,6 +32,15 @@ export function updateGameState(room, newState) {
     }
 }
 
+export function updateRoomDifficulty(room, difficulty) {
+    if (rooms[room]) {
+        rooms[room].difficulty = difficulty;
+        rooms[room].gameState = initializeGame(getDifficultySettings(difficulty));
+        return rooms[room].gameState.katex;
+    }
+    return null;
+}
+
 export function broadcastToRoom(room, message) {
     if (rooms[room]) {
         rooms[room].clients.forEach(client => {
@@ -40,6 +49,14 @@ export function broadcastToRoom(room, message) {
             }
         });
     }
+}
+
+export function getRoomClients(room) {
+    return rooms[room] ? rooms[room].clients : [];
+}
+
+export function getRoomDifficulty(room) {
+    return rooms[room] ? rooms[room].difficulty : 'medium';
 }
 
 export function getRoomState(room) {

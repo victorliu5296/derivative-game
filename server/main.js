@@ -1,14 +1,13 @@
-// main.js
-
 import * as RoomManager from './roomManager.js';
 import * as GameState from './derivative-logic/gameState.js';
 
-export function handleJoinRoom(ws, roomId) {
-    RoomManager.joinRoom(ws, roomId);
+export function handleJoinRoom(ws, roomId, difficulty = 'medium') {
+    RoomManager.joinRoom(ws, roomId, difficulty);
     const gameState = GameState.getGameState(roomId);
     ws.send(JSON.stringify({
         type: 'gameState',
-        data: gameState
+        data: gameState,
+        difficulty: RoomManager.getRoomDifficulty(roomId)
     }));
     broadcastRoomUpdate(roomId);
 }
@@ -36,6 +35,17 @@ export function handleResetGame(roomId) {
     });
 }
 
+export function handleChangeDifficulty(roomId, difficulty) {
+    const updatedExpression = RoomManager.updateRoomDifficulty(roomId, difficulty);
+    if (updatedExpression) {
+        RoomManager.broadcastToRoom(roomId, {
+            type: 'difficultyUpdate',
+            difficulty: difficulty,
+            expression: updatedExpression
+        });
+    }
+}
+
 function broadcastRoomUpdate(roomId) {
     const clients = RoomManager.getRoomClients(roomId);
     RoomManager.broadcastToRoom(roomId, {
@@ -43,5 +53,3 @@ function broadcastRoomUpdate(roomId) {
         data: { clientCount: clients.length }
     });
 }
-
-// You would call these functions from your WebSocket server logic

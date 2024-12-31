@@ -1,4 +1,5 @@
 export let currentLanguage = 'fr'; // Default language
+export let currentTranslations = {}; // Store translations globally
 
 export async function loadTranslations(language) {
     const response = await fetch(`/locales/${language}.json`);
@@ -8,41 +9,54 @@ export async function loadTranslations(language) {
 export async function updateLanguage(language) {
     currentLanguage = language;
     const translations = await loadTranslations(language);
+    currentTranslations = translations; // Save translations globally
 
-    document.title = translations.title;
-    document.querySelector('h1').textContent = translations.title;
-    document.querySelector('h2').textContent = translations.currentFunction;
+    // Map of element IDs or selectors to translation keys
+    const translationMap = {
+        'title': translations.title,
+        'h1': translations.title,
+        'h2': translations.currentFunction,
+        'simplifyButton': translations.simplifyButton,
+        'derivativeRulesTitle': translations.derivativeRules,
+        'linearityRuleButton': translations.applyLinearityRule,
+        'powerRuleButton': translations.applyPowerRule,
+        'chainRuleButton': translations.applyChainRule,
+        'productRuleButton': translations.applyProductRule,
+        'quotientRuleButton': translations.applyQuotientRule,
+        'constantRuleButton': translations.applyConstantRule,
+        'functionDerivativesTitle': translations.functionDerivatives,
+        'exponentialFunctionButton': translations.exponentialFunction,
+        'logarithmicFunctionButton': translations.logarithmicFunction,
+        'rewriteRecipTrigFunctionsButton': translations.rewriteRecipTrigFunctions,
+        'sineFunctionButton': translations.sineFunction,
+        'cosineFunctionButton': translations.cosineFunction,
+        'tangentFunctionButton': translations.tangentFunction,
+        'inverseSineFunctionButton': translations.inverseSineFunction,
+        'inverseCosineFunctionButton': translations.inverseCosineFunction,
+        'inverseTangentFunctionButton': translations.inverseTangentFunction,
+        "fieldset legend:first-of-type": translations.exponentialAndLogarithmic,
+        "fieldset legend:nth-of-type(2)": translations.trigonometricFunctions,
+        '#difficultySettings label[for="difficulty"]': translations.difficultyLabel,
+        '#difficultySelect option[value="easy"]': translations.difficultyEasy,
+        '#difficultySelect option[value="medium"]': translations.difficultyMedium,
+        '#difficultySelect option[value="hard"]': translations.difficultyHard,
+        '#difficultySelect option[value="expert"]': translations.difficultyExpert
+    };
 
-    document.getElementById('simplifyButton').textContent = translations.simplifyButton;
+    // Update all mapped elements with their corresponding translation
+    Object.entries(translationMap).forEach(([selector, text]) => {
+        const element = document.querySelector(selector);
 
-    // Update derivative rule buttons
-    document.getElementById('derivativeRulesTitle').textContent = translations.derivativeRules;
-    document.getElementById('linearityRuleButton').textContent = translations.applyLinearityRule;
-    document.getElementById('powerRuleButton').textContent = translations.applyPowerRule;
-    document.getElementById('chainRuleButton').textContent = translations.applyChainRule;
-    document.getElementById('productRuleButton').textContent = translations.applyProductRule;
-    document.getElementById('quotientRuleButton').textContent = translations.applyQuotientRule;
-    document.getElementById('constantRuleButton').textContent = translations.applyConstantRule;
+        if (element) {
+            if (element.tagName === 'OPTION') {
+                element.textContent = text;
+            } else {
+                element.textContent = text;
+            }
+        }
+    });
 
-    // Update fieldset legends and function derivative buttons
-    document.querySelector('fieldset legend').textContent = translations.exponentialAndLogarithmic;
-    document.querySelector('fieldset:nth-of-type(2) legend').textContent = translations.trigonometricFunctions;
-
-    document.getElementById('functionDerivativesTitle').textContent = translations.functionDerivatives;
-    document.getElementById('exponentialFunctionButton').textContent = translations.exponentialFunction;
-    document.getElementById('logarithmicFunctionButton').textContent = translations.logarithmicFunction;
-
-    document.getElementById('rewriteRecipTrigFunctionsButton').textContent = translations.rewriteRecipTrigFunctions;
-    document.getElementById('sineFunctionButton').textContent = translations.sineFunction;
-    document.getElementById('cosineFunctionButton').textContent = translations.cosineFunction;
-    document.getElementById('tangentFunctionButton').textContent = translations.tangentFunction;
-    document.getElementById('inverseSineFunctionButton').textContent = translations.inverseSineFunction;
-    document.getElementById('inverseCosineFunctionButton').textContent = translations.inverseCosineFunction;
-    document.getElementById('inverseTangentFunctionButton').textContent = translations.inverseTangentFunction;
-
-    document.getElementById('messages').textContent = translations.connected;
-
-    // Render KaTeX in all relevant elements
+    // Render KaTeX for math expressions
     renderMathInElement(document.body, {
         delimiters: [
             { left: "\\(", right: "\\)", display: false },

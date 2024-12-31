@@ -23,5 +23,10 @@
   "inverseTangentFunction": "\\(\\tan^{-1}\\)",
   "connected": "Connected to the server!",
   "disconnected": "Disconnected from the server",
-  "simplificationAlreadyApplied": "Simplification has already been applied"
+  "simplificationAlreadyApplied": "Simplification has already been applied",
+  "difficultyLabel": "Difficulty Level:",
+  "difficultyEasy": "Easy",
+  "difficultyMedium": "Medium",
+  "difficultyHard": "Hard",
+  "difficultyExpert": "Expert"
 }
