@@ -10,28 +10,39 @@ const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 // Determine the correct WebSocket host
 const host = window.location.host.includes('localhost') ? 'localhost:3000' : window.location.host;
 
-export const socket = new WebSocket(`${protocol}//${host}`);
+export let socket = null;
 
-// Function to update WebSocket messages dynamically
-function updateWebSocketMessages() {
-    const messagesElement = document.getElementById('messages');
+export function initializeWebSocket() {
+    const room = getRoomId();
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host.includes('localhost') ? 'localhost:3000' : window.location.host;
 
-    socket.onopen = function (event) {
+    socket = new WebSocket(`${protocol}//${host}`);
+
+    socket.onopen = function () {
         console.log('Connected to WebSocket server');
-        messagesElement.textContent =
-            currentTranslations.connected || 'Connected to the server!'; // Use translation or fallback
+        const messagesElement = document.getElementById('messages');
+        if (messagesElement) {
+            messagesElement.textContent =
+                currentTranslations.connected || 'Connected to the server!';
+        }
+        console.log(`currentTranslations.connected: ${currentTranslations.connected}`);
 
-        // Join the room
-        socket.send(JSON.stringify({
-            type: 'join',
-            room: room
-        }));
+        socket.send(
+            JSON.stringify({
+                type: 'join',
+                room: room,
+            })
+        );
     };
 
-    socket.onclose = function (event) {
+    socket.onclose = function () {
         console.log('Disconnected from WebSocket server');
-        messagesElement.textContent =
-            currentTranslations.disconnected || 'Disconnected from the server'; // Use translation or fallback
+        const messagesElement = document.getElementById('messages');
+        if (messagesElement) {
+            messagesElement.textContent =
+                currentTranslations.disconnected || 'Disconnected from the server';
+        }
     };
 
     socket.onerror = function (error) {
@@ -65,9 +76,4 @@ function updateWebSocketMessages() {
 }
 
 // Call this function initially to bind event handlers
-updateWebSocketMessages();
-
-// Export a function to rebind WebSocket messages when language changes
-export function refreshWebSocketMessages() {
-    updateWebSocketMessages();
-}
+initializeWebSocket();
