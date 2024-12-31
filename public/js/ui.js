@@ -1,51 +1,15 @@
 import { socket } from './websocket.js';
 
 export function initializeUI() {
-    setupRuleButtons();
-    setupFunctionDerivativeButtons();
-    setupReciprocalTrigButton();
-    setupSimplifyButton();
-}
-
-function setupSimplifyButton() {
-    const simplifyButton = document.getElementById('simplifyButton');
-    if (!simplifyButton) {
-        return;
-    }
-    simplifyButton.addEventListener('click', () => {
-        socket.send(JSON.stringify({
-            type: 'simplify'
-        }));
-        console.log('Simplify button clicked');
-    });
-}
-
-function setupRuleButtons() {
     const ruleButtons = [
+        { id: 'simplifyButton', rule: 'simplify' }, // Simplify is treated as a rule
+        { id: 'rewriteRecipTrigFunctionsButton', rule: 'rewriteRecipTrigFunctions' },
         { id: 'powerRuleButton', rule: 'power' },
         { id: 'productRuleButton', rule: 'product' },
         { id: 'chainRuleButton', rule: 'chain' },
         { id: 'quotientRuleButton', rule: 'quotient' },
         { id: 'linearityRuleButton', rule: 'linearity' },
         { id: 'constantRuleButton', rule: 'constant' },
-    ];
-
-    ruleButtons.forEach(({ id, rule }) => {
-        const button = document.getElementById(id);
-        if (button) {
-            button.addEventListener('click', () => {
-                socket.send(JSON.stringify({
-                    type: 'applyRule',
-                    rule: rule
-                }));
-                console.log(`${rule.charAt(0).toUpperCase() + rule.slice(1)} Rule clicked`);
-            });
-        }
-    });
-}
-
-function setupFunctionDerivativeButtons() {
-    const derivativeButtons = [
         { id: 'exponentialFunctionButton', rule: 'exp' },
         { id: 'logarithmicFunctionButton', rule: 'ln' },
         { id: 'sineFunctionButton', rule: 'sin' },
@@ -56,30 +20,32 @@ function setupFunctionDerivativeButtons() {
         { id: 'inverseTangentFunctionButton', rule: 'arctan' },
     ];
 
-    derivativeButtons.forEach(({ id, rule }) => {
-        const button = document.getElementById(id);
-        if (button) {
-            button.addEventListener('click', () => {
-                socket.send(JSON.stringify({
-                    type: 'applyRule',
-                    rule: rule
-                }));
-                console.log(`${rule} Function clicked`);
-            });
-        }
+    setupMultipleButtons(ruleButtons, (rule) => {
+        console.log(`Button clicked for rule: ${rule}`);
+        sendSocketMessage('applyRule', { rule });
     });
 }
 
-function setupReciprocalTrigButton() {
-    const rewriteRecipTrigFunctionsButton = document.getElementById('rewriteRecipTrigFunctionsButton');
-    if (rewriteRecipTrigFunctionsButton) {
-        rewriteRecipTrigFunctionsButton.addEventListener('click', () => {
-            socket.send(JSON.stringify({
-                type: 'rewriteRecipTrigFunctions'
-            }));
-            console.log('Rewrite Reciprocal Trigonometric Functions clicked');
-        });
+function setupButtons(buttonId, callback) {
+    const button = document.getElementById(buttonId);
+    if (button) {
+        console.log(`Setting up button with ID: ${buttonId}`);
+        button.addEventListener('click', callback);
+    } else {
+        console.warn(`Button with ID ${buttonId} not found`);
     }
+}
+
+function setupMultipleButtons(buttonConfigs, callback) {
+    buttonConfigs.forEach(({ id, rule }) => {
+        setupButtons(id, () => callback(rule));
+    });
+}
+
+function sendSocketMessage(type, data = {}) {
+    const message = { type, ...data };
+    console.log(`Sending WebSocket message:`, message);
+    socket.send(JSON.stringify(message));
 }
 
 export function renderWithAnimation(elementId, latexString) {
@@ -90,32 +56,32 @@ export function renderWithAnimation(elementId, latexString) {
         return;
     }
 
+    console.log(`Rendering LaTeX string for element ${elementId}:`, latexString);
     element.textContent = ''; // Clear previous content
+    element.classList.remove('animate'); // Remove the animation class
+    katex.render(latexString, element, { throwOnError: false }); // Render the LaTeX
 
-    // Remove the previous animation class if it's already there
-    element.classList.remove('animate');
-
-    // Render the LaTeX using KaTeX
-    katex.render(latexString, element, {
-        throwOnError: false
-    });
-
-    // Trigger reflow to restart the animation
-    void element.offsetWidth;
-
-    // Add the animation class to trigger the fade-in and scale-up animation
-    element.classList.add('animate');
+    void element.offsetWidth; // Trigger reflow to restart animation
+    element.classList.add('animate'); // Add animation class
 }
 
 export function displayMessage(message) {
+    console.log('Displaying message:', message);
     const messagesElement = document.getElementById('messages');
-    messagesElement.textContent = message;
+    if (messagesElement) {
+        messagesElement.textContent = message;
+    } else {
+        console.error('Messages element not found');
+    }
 }
 
 export function triggerErrorAnimation(elementId, errorMessage) {
     const element = document.getElementById(elementId);
     if (element) {
+        console.log(`Triggering error animation for ${elementId}:`, errorMessage);
         element.classList.add('shake-error');
         setTimeout(() => element.classList.remove('shake-error'), 1000); // Remove animation after 1 second
+    } else {
+        console.error(`Element with ID ${elementId} not found for error animation`);
     }
 }

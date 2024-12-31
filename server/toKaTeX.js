@@ -1,63 +1,63 @@
-export function toKaTeX(expr, parentOp = null) {
-    if (!expr) {
-        console.error('Received null or undefined node in toKaTeX');
+export function toKaTeX(tree, parentOp = null) {
+    if (!tree) {
+        console.error('Received null or undefined node in toKaTeX: ', JSON.stringify(tree, null, 2));
         return '';
     }
-    switch (expr.type) {
+    switch (tree.type) {
         case 'constant':
-            return expr.value.toString();
+            return tree.value.toString();
         case 'variable':
-            return expr.name;
+            return tree.name;
         case 'binary':
-            return formatBinaryOperation(expr, parentOp);
+            return formatBinaryOperation(tree, parentOp);
         case 'function':
-            return `\\${expr.name}\\left(${toKaTeX(expr.argument)}\\right)`;
+            return `\\${tree.name}\\left(${toKaTeX(tree.argument)}\\right)`;
         case 'derivative':
-            return formatDerivative(expr);
+            return formatDerivative(tree);
         default:
             throw new Error('Unknown expression type');
     }
 }
 
-function formatDerivative(expr) {
-    if (expr.variable && expr.variable.type === 'function') {
+function formatDerivative(tree) {
+    if (tree.variable && tree.variable.type === 'function') {
         // This is for cases like d/d(6x) sin(6x)
-        return `\\frac{d}{d\\left(${toKaTeX(expr.variable)}\\right)}${toKaTeX(expr.expression)}`;
+        return `\\frac{d}{d\\left(${toKaTeX(tree.variable)}\\right)}${toKaTeX(tree.tree)}`;
     } else {
         // General case
-        const variable = expr.variable ? toKaTeX(expr.variable) : 'x';
+        const variable = tree.variable ? toKaTeX(tree.variable) : 'x';
         const wrappedVariable = variable === 'x' ? 'x' : `\\left(${variable}\\right)`;
-        return `\\frac{d}{d${wrappedVariable}}\\left(${toKaTeX(expr.expression)}\\right)`;
+        return `\\frac{d}{d${wrappedVariable}}\\left(${toKaTeX(tree.tree)}\\right)`;
     }
 }
 
-function formatBinaryOperation(expr, parentOp) {
-    const left = toKaTeX(expr.left);
-    const right = toKaTeX(expr.right);
+function formatBinaryOperation(tree, parentOp) {
+    const left = toKaTeX(tree.left);
+    const right = toKaTeX(tree.right);
     if (!left || !right) {
         console.error('Invalid binary operation in toKaTeX');
         return '';
     }
     let result;
-    switch (expr.operator) {
+    switch (tree.operator) {
         case '+':
         case '-':
-            result = `${toKaTeX(expr.left, expr.operator)} ${expr.operator} ${toKaTeX(expr.right, expr.operator)}`;
+            result = `${toKaTeX(tree.left, tree.operator)} ${tree.operator} ${toKaTeX(tree.right, tree.operator)}`;
             break;
         case '*':
-            result = formatMultiplication(expr);
+            result = formatMultiplication(tree);
             break;
         case '/':
-            result = `\\frac{${toKaTeX(expr.left)}}{${toKaTeX(expr.right)}}`;
+            result = `\\frac{${toKaTeX(tree.left)}}{${toKaTeX(tree.right)}}`;
             break;
         case '^':
-            result = formatExponentiation(expr);
+            result = formatExponentiation(tree);
             break;
         default:
             throw new Error('Unknown binary operator');
     }
 
-    return needsParentheses(expr, parentOp) ? wrapParentheses(result) : result;
+    return needsParentheses(tree, parentOp) ? wrapParentheses(result) : result;
 }
 
 function formatMultiplication(expr) {
@@ -76,9 +76,9 @@ function formatMultiplication(expr) {
     return `${left} \\cdot ${right}`;
 }
 
-function formatExponentiation(expr) {
-    const base = toKaTeX(expr.left, '^');
-    const exponent = toKaTeX(expr.right);
+function formatExponentiation(tree) {
+    const base = toKaTeX(tree.left, '^');
+    const exponent = toKaTeX(tree.right);
 
     // Omit exponents of 1
     if (exponent === '1') return base;
@@ -89,8 +89,8 @@ function formatExponentiation(expr) {
     return `{${base}}^{${exponent}}`;
 }
 
-function needsParentheses(expr, parentOp) {
-    if (expr.type !== 'binary') return false;
+function needsParentheses(tree, parentOp) {
+    if (tree.type !== 'binary') return false;
 
     const precedence = {
         '^': 4,
@@ -100,7 +100,7 @@ function needsParentheses(expr, parentOp) {
         '-': 2
     };
 
-    return precedence[expr.operator] < precedence[parentOp];
+    return precedence[tree.operator] < precedence[parentOp];
 }
 
 function wrapParentheses(str) {

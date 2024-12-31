@@ -1,65 +1,59 @@
-import { initializeWebSocket } from './websocket.js';
-
 export let currentLanguage = 'fr'; // Default language
-export let currentTranslations = {}; // Store translations globally
 
-// Function to load translations from a JSON file
 export async function loadTranslations(language) {
     const response = await fetch(`/locales/${language}.json`);
     return await response.json();
 }
 
-// Function to update language and refresh UI
 export async function updateLanguage(language) {
     currentLanguage = language;
     const translations = await loadTranslations(language);
-    currentTranslations = translations; // Save translations globally
-    console.log('Loaded Translations:', currentTranslations);
 
-    // Map of element IDs or selectors to translation keys
-    const translationMap = {
-        'title': translations.title,
-        'h1': translations.title,
-        'h2': translations.currentFunction,
-        'simplifyButton': translations.simplifyButton,
-        'derivativeRulesTitle': translations.derivativeRules,
-        'linearityRuleButton': translations.applyLinearityRule,
-        'powerRuleButton': translations.applyPowerRule,
-        'chainRuleButton': translations.applyChainRule,
-        'productRuleButton': translations.applyProductRule,
-        'quotientRuleButton': translations.applyQuotientRule,
-        'constantRuleButton': translations.applyConstantRule,
-        'functionDerivativesTitle': translations.functionDerivatives,
-        'exponentialFunctionButton': translations.exponentialFunction,
-        'logarithmicFunctionButton': translations.logarithmicFunction,
-        'rewriteRecipTrigFunctionsButton': translations.rewriteRecipTrigFunctions,
-        'sineFunctionButton': translations.sineFunction,
-        'cosineFunctionButton': translations.cosineFunction,
-        'tangentFunctionButton': translations.tangentFunction,
-        'inverseSineFunctionButton': translations.inverseSineFunction,
-        'inverseCosineFunctionButton': translations.inverseCosineFunction,
-        'inverseTangentFunctionButton': translations.inverseTangentFunction,
-        "fieldset legend:first-of-type": translations.exponentialAndLogarithmic,
-        "fieldset legend:nth-of-type(2)": translations.trigonometricFunctions,
-        '#difficultySettings label[for="difficulty"]': translations.difficultyLabel,
-        '#difficultySelect option[value="easy"]': translations.difficultyEasy,
-        '#difficultySelect option[value="medium"]': translations.difficultyMedium,
-        '#difficultySelect option[value="hard"]': translations.difficultyHard,
-        '#difficultySelect option[value="expert"]': translations.difficultyExpert
+    // Define a mapping of element IDs/selectors to their translation keys
+    const elementTranslations = {
+        'title': ['title', 'title'], // [selector, translationKey]
+        'h1': ['h1', 'title'],
+        'h2': ['h2', 'currentFunction'],
+        'simplifyButton': ['#simplifyButton', 'simplifyButton'],
+
+        // Derivative rule buttons
+        'linearityRuleButton': ['#linearityRuleButton', 'applyLinearityRule'],
+        'powerRuleButton': ['#powerRuleButton', 'applyPowerRule'],
+        'chainRuleButton': ['#chainRuleButton', 'applyChainRule'],
+        'productRuleButton': ['#productRuleButton', 'applyProductRule'],
+        'quotientRuleButton': ['#quotientRuleButton', 'applyQuotientRule'],
+        'constantRuleButton': ['#constantRuleButton', 'applyConstantRule'],
+
+        // Fieldset legends
+        'fieldsetLegend1': ['fieldset legend', 'exponentialAndLogarithmic'],
+        'fieldsetLegend2': ['fieldset:nth-of-type(2) legend', 'trigonometricFunctions'],
+
+        // Function buttons
+        'exponentialFunctionButton': ['#exponentialFunctionButton', 'exponentialFunction'],
+        'logarithmicFunctionButton': ['#logarithmicFunctionButton', 'logarithmicFunction'],
+        'rewriteRecipTrigFunctionsButton': ['#rewriteRecipTrigFunctionsButton', 'rewriteRecipTrigFunctions'],
+        'sineFunctionButton': ['#sineFunctionButton', 'sineFunction'],
+        'cosineFunctionButton': ['#cosineFunctionButton', 'cosineFunction'],
+        'tangentFunctionButton': ['#tangentFunctionButton', 'tangentFunction'],
+        'inverseSineFunctionButton': ['#inverseSineFunctionButton', 'inverseSineFunction'],
+        'inverseCosineFunctionButton': ['#inverseCosineFunctionButton', 'inverseCosineFunction'],
+        'inverseTangentFunctionButton': ['#inverseTangentFunctionButton', 'inverseTangentFunction'],
+        'messages': ['#messages', 'connected']
     };
 
-    // Update the UI translations
-    Object.entries(translationMap).forEach(([selector, text]) => {
-        const element = document.querySelector(selector);
-        if (element) {
-            element.textContent = text || ''; // Fallback to empty string if text is undefined
+    // Update all elements
+    Object.entries(elementTranslations).forEach(([key, [selector, translationKey]]) => {
+        if (selector === 'title') {
+            document.title = translations[translationKey];
+        } else {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.textContent = translations[translationKey];
+            }
         }
     });
 
-    // Rebind WebSocket messages with updated translations
-    initializeWebSocket?.(); // Ensure this function is defined safely
-
-    // Render KaTeX for math expressions
+    // Render KaTeX in all relevant elements
     renderMathInElement(document.body, {
         delimiters: [
             { left: "\\(", right: "\\)", display: false },
@@ -67,9 +61,3 @@ export async function updateLanguage(language) {
         ]
     });
 }
-
-// Ensure WebSocket is initialized the first time translations are loaded
-(async function initializeApp() {
-    await updateLanguage(currentLanguage); // Load default language translations
-    initializeWebSocket(); // Open WebSocket connection after translations are ready
-})();

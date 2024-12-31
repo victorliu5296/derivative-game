@@ -1,6 +1,6 @@
 import * as math from 'mathjs';
 import { createConstant, createVariable, createBinaryOp, createFunction, createDerivative } from './expressionStructure.js';
-import { toKaTeX } from './katexConverter.js';
+import { toKaTeX } from './toKaTeX.js';
 
 // Convert your nested object structure to mathjs expression string
 function treeToMathjs(node) {
@@ -18,7 +18,7 @@ function treeToMathjs(node) {
         case 'function':
             return `${node.name}(${treeToMathjs(node.argument)})`;
         case 'derivative':
-            return `derivative(${treeToMathjs(node.expression)}, "${node.variable}")`;
+            return `derivative(${treeToMathjs(node.tree)}, "${node.variable}")`;
         default:
             console.error('Unknown node type in treeToMathjs:', node.type);
             return '';
@@ -26,17 +26,17 @@ function treeToMathjs(node) {
 }
 
 // Parse mathjs expression back to your nested object structure
-function mathjsToTree(expression) {
+function mathjsToTree(tree) {
     try {
-        let parsedExpression;
-        if (typeof expression === 'string') {
-            parsedExpression = math.parse(expression);
-        } else if (expression.toString && typeof expression.toString === 'function') {
-            parsedExpression = math.parse(expression.toString());
+        let parsedTree;
+        if (typeof tree === 'string') {
+            parsedTree = math.parse(tree);
+        } else if (tree.toString && typeof tree.toString === 'function') {
+            parsedTree = math.parse(tree.toString());
         } else {
             throw new Error('Invalid expression type in mathjsToTree');
         }
-        return convertNode(parsedExpression);
+        return convertNode(parsedTree);
     } catch (error) {
         console.error('Error in mathjsToTree:', error);
         return null;
@@ -86,19 +86,6 @@ function convertNode(node) {
     }
 }
 
-// Check if a subtree contains a derivative node
-function containsDerivative(node) {
-    if (!node) return false;
-    if (node.type === 'derivative') return true;
-    if (node.type === 'binary') {
-        return containsDerivative(node.left) || containsDerivative(node.right);
-    }
-    if (node.type === 'function') {
-        return containsDerivative(node.argument);
-    }
-    return false;
-}
-
 const simplificationRules = [
     { l: "n1/n2/n3", r: "n1/(n2*n3)", repeat: true },
     { l: "n1/n2*n3", r: "(n1*n3)/n2" },
@@ -106,7 +93,7 @@ const simplificationRules = [
 
 function simplifySubExpression(node) {
     if (node.type === 'derivative') {
-        const simplifiedInner = simplifySubExpression(node.expression);
+        const simplifiedInner = simplifySubExpression(node.tree);
         return createDerivative(simplifiedInner, node.variable);
     }
     try {
@@ -147,7 +134,7 @@ function simplifyExpressionTree(node, isTopLevel = true) {
                 const newFunc = createFunction(node.name, simplifiedArg);
                 return isTopLevel ? simplifySubExpression(newFunc) : newFunc;
             case 'derivative':
-                const simplifiedExpr = simplifyExpressionTree(node.expression, true);
+                const simplifiedExpr = simplifyExpressionTree(node.tree, true);
                 return createDerivative(simplifiedExpr, node.variable);
             default:
                 console.error('Unknown node type in simplifyExpressionTree:', node.type);
@@ -161,23 +148,37 @@ function simplifyExpressionTree(node, isTopLevel = true) {
 
 export function simplifyExpression(node) {
     try {
+        console.log('Simplifying expression tree:', JSON.stringify(node, null, 2));
         const simplifiedTree = simplifyExpressionTree(node, true);
         if (!simplifiedTree) {
             console.error('simplifyExpressionTree returned null');
-            return { expression: node, katex: toKaTeX(node) };
+            return node;
         }
-        console.log('Simplified tree:', JSON.stringify(treeToMathjs(simplifiedTree), null, 2));
+        console.log('Simplified tree:', JSON.stringify(simplifiedTree, null, 2));
         let katexString = toKaTeX(simplifiedTree);
         console.log('KaTeX string:', katexString);
-        return {
-            expression: simplifiedTree,
-            katex: katexString
-        };
+        return simplifiedTree;
     } catch (error) {
         console.error('Error in simplifyExpression:', error);
-        return {
-            expression: node,
-            katex: toKaTeX(node)
-        };
+        return node;
+    }
+}
+
+export function isFullyDifferentiated(tree) {
+    if (!tree) return true;
+
+    switch (tree.type) {
+        case 'derivative':
+            return false;
+        case 'binary':
+            return isFullyDifferentiated(tree.left) && isFullyDifferentiated(tree.right);
+        case 'function':
+            return isFullyDifferentiated(tree.argument);
+        case 'constant':
+        case 'variable':
+            return true;
+        default:
+            console.error('Unknown tree type in isFullyDifferentiated:', tree);
+            return true;
     }
 }

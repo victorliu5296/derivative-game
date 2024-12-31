@@ -1,22 +1,20 @@
 import { createConstant, createVariable, createBinaryOp, createFunction, createDerivative } from './expressionStructure.js';
-import { getDifficultySettings } from './difficultySettings.js';
 
-export function generateRandomFunction(options = {}) {
-    const settings = getDifficultySettings();
+export function generateRandomFunction(difficultySettings = {}) {
 
     const {
-        minTerms,
-        maxTerms,
-        maxDepth,
-        maxCoefficient,
-        functionProbability,
-        exponentProbability,
-        maxConstantExponent,
-        maxExponentNesting,
-        allowNonConstantExponents,
-        functions,
-        operators
-    } = settings;
+        minTerms = 2,
+        maxTerms = 5,
+        maxDepth = 3,
+        maxCoefficient = 10,
+        functionProbability = 0.3,
+        exponentProbability = 0.2,
+        maxConstantExponent = 5,
+        maxExponentNesting = 2,
+        allowNonConstantExponents = false,
+        functions = ['sin', 'cos', 'ln', 'exp'],
+        operators = ['+', '-', '*', '/']
+    } = difficultySettings;
 
     const variableName = 'x';
     const fullOperators = exponentProbability > 0 ? [...operators, '^'] : operators;

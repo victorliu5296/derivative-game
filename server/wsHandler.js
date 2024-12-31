@@ -1,10 +1,8 @@
-import { joinRoom, leaveRoom, updateGameState, broadcastToRoom, getRoomState, updateRoomDifficulty } from './roomManager.js';
-import { applyDerivativeRule } from './derivative-logic/gameLogic.js';
-import { simplifyExpression } from './derivative-logic/expressionSimplifier.js';
+import { joinRoom, leaveRoom, broadcastToRoom, updateGameState, resetRoomState } from './roomManager.js';
+import { applyRuleToGameState } from './gameState.js';
 
 export function handleWebSocketConnection(ws) {
     let currentRoom = null;
-    let lastAction = null;
 
     ws.on('message', (message) => {
         try {
@@ -14,9 +12,8 @@ export function handleWebSocketConnection(ws) {
             const handlers = {
                 join: handleJoin,
                 applyRule: handleApplyRule,
-                simplify: handleSimplify,
+                reset: handleReset,
                 message: handleMessage,
-                changeDifficulty: handleChangeDifficulty
             };
 
             const handler = handlers[data.type];
@@ -26,89 +23,73 @@ export function handleWebSocketConnection(ws) {
                 throw new Error('Unknown message type');
             }
         } catch (error) {
-            handleError(error);
+            handleError(ws, error);
         }
     });
 
-    ws.on('close', handleClose);
+    ws.on('close', () => {
+        if (currentRoom) {
+            leaveRoom(ws, currentRoom);
+        }
+    });
 
     function handleJoin(data) {
         currentRoom = data.room;
-        const initialExpression = joinRoom(ws, currentRoom, data.difficulty || 'medium');
-        sendToClient('newExpression', { expression: initialExpression });
+        const initialState = joinRoom(ws, currentRoom, data.difficulty || 'medium');
+        sendGameStateUpdate(ws, initialState);
     }
 
     function handleApplyRule(data) {
         if (!currentRoom) throw new Error('No current room');
 
-        const roomState = getRoomState(currentRoom);
-        if (!roomState || !data.rule) throw new Error('Invalid state or rule');
+        console.log(`Applying rule "${data.rule}" to room: ${currentRoom}`);
 
-        console.log('Applying rule:', data.rule);
-        const result = applyDerivativeRule(roomState.expression, data.rule);
-
-        updateGameState(currentRoom, result);
-
-        broadcastToRoom(currentRoom, {
-            type: 'newExpression',
-            expression: result.katex
-        });
-
-        lastAction = 'applyRule' + data.rule;
+        // Pass the roomId directly to applyRuleToGameState
+        const updatedState = updateGameState(currentRoom, (state) =>
+            applyRuleToGameState(currentRoom, data.rule)
+        );
+        broadcastGameStateUpdate(currentRoom, updatedState);
     }
 
-    function handleSimplify() {
+    function handleReset() {
         if (!currentRoom) throw new Error('No current room');
 
-        const roomState = getRoomState(currentRoom);
-
-        if (!roomState || lastAction === 'simplify') throw new Error('Invalid state or already simplified');
-
-        const simplifiedResult = simplifyExpression(roomState.expression);
-
-        updateGameState(currentRoom, simplifiedResult);
-
-        broadcastToRoom(currentRoom, {
-            type: 'newExpression',
-            expression: simplifiedResult.katex
-        });
-
-        lastAction = 'simplify';
-    }
-
-    function handleChangeDifficulty(data) {
-        if (!currentRoom || !data.difficulty) throw new Error('No current room or invalid difficulty');
-
-        const updatedExpression = updateRoomDifficulty(currentRoom, data.difficulty);
-
-        if (updatedExpression) {
-            broadcastToRoom(currentRoom, {
-                type: 'difficultyUpdate',
-                difficulty: data.difficulty,
-                expression: updatedExpression
-            });
-        }
+        const resetState = resetRoomState(currentRoom);
+        broadcastGameStateUpdate(currentRoom, resetState);
     }
 
     function handleMessage(data) {
-        if (currentRoom && data.message) {
+        if (currentRoom) {
             broadcastToRoom(currentRoom, {
                 type: 'message',
-                message: data.message
+                message: data.message,
             });
         }
     }
 
-    function handleClose() {
-        if (currentRoom) leaveRoom(ws, currentRoom);
+    function sendGameStateUpdate(client, state) {
+        client.send(
+            JSON.stringify({
+                type: 'gameStateUpdate',
+                state,
+            })
+        );
     }
 
-    function handleError(error) {
+    function broadcastGameStateUpdate(room, state) {
+        broadcastToRoom(room, {
+            type: 'gameStateUpdate',
+            state,
+        });
+    }
+
+    function handleError(client, error) {
         console.error('Error:', error.message);
-        sendToClient('error', { message: error.message });
-    }
-
-    function sendToClient(type, data) {
-        ws.send(JSON.stringify({ type, ...data }));
+        client.send(
+            JSON.stringify({
+                type: 'error',
+                message: error.message,
+            })
+        );
     }
 }

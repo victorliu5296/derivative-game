@@ -1,79 +1,103 @@
 import { getRoomId } from './room.js';
 import { renderWithAnimation, displayMessage, triggerErrorAnimation } from './ui.js';
-import { currentTranslations } from './translations.js'; // Import translations
 
 const room = getRoomId();
 
-// Determine the correct WebSocket protocol based on the environment
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-
-// Determine the correct WebSocket host
 const host = window.location.host.includes('localhost') ? 'localhost:3000' : window.location.host;
 
-export let socket = null;
+export const socket = new WebSocket(`${protocol}//${host}`);
 
-export function initializeWebSocket() {
-    const room = getRoomId();
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host.includes('localhost') ? 'localhost:3000' : window.location.host;
+socket.onopen = function () {
+    console.log('Connected to WebSocket server');
+    displayMessage('Connected to the server!');
 
-    socket = new WebSocket(`${protocol}//${host}`);
-
-    socket.onopen = function () {
-        console.log('Connected to WebSocket server');
-        const messagesElement = document.getElementById('messages');
-        if (messagesElement) {
-            messagesElement.textContent =
-                currentTranslations.connected || 'Connected to the server!';
-        }
-        console.log(`currentTranslations.connected: ${currentTranslations.connected}`);
-
-        socket.send(
-            JSON.stringify({
-                type: 'join',
-                room: room,
-            })
-        );
+    // Join the room
+    const joinMessage = {
+        type: 'join',
+        room: room,
     };
+    console.log('Sending join message:', joinMessage);
+    socket.send(JSON.stringify(joinMessage));
+};
 
-    socket.onclose = function () {
-        console.log('Disconnected from WebSocket server');
-        const messagesElement = document.getElementById('messages');
-        if (messagesElement) {
-            messagesElement.textContent =
-                currentTranslations.disconnected || 'Disconnected from the server';
-        }
-    };
+socket.onclose = function () {
+    console.log('Disconnected from WebSocket server');
+    displayMessage('Disconnected from the server');
+};
 
-    socket.onerror = function (error) {
-        console.error('WebSocket error observed:', error);
-    };
+socket.onerror = function (error) {
+    console.error('WebSocket error observed:', error);
+};
 
-    socket.onmessage = (event) => {
+socket.onmessage = function (event) {
+    console.log('Message received from server:', event.data);
+    try {
         const data = JSON.parse(event.data);
 
         switch (data.type) {
-            case 'newExpression':
-                if (data.expression && data.expression.error) {
-                    triggerErrorAnimation('currentExpression', data.expression.error);
-                } else {
-                    renderWithAnimation('currentExpression', data.expression);
-                }
+            case 'gameStateUpdate':
+                console.log('Handling gameStateUpdate:', data);
+                handleGameStateUpdate(data);
                 break;
             case 'message':
+                console.log('Handling message:', data.message);
                 displayMessage(data.message);
                 break;
             case 'simplificationStatus':
+                console.log('Handling simplificationStatus:', data);
                 if (data.status === 'alreadyApplied') {
-                    triggerErrorAnimation(
-                        'simplifyButton',
-                        currentTranslations.simplificationAlreadyApplied || "Simplification already applied" // Use translation or fallback
-                    );
+                    triggerErrorAnimation('simplifyButton', 'Simplification already applied');
                 }
                 break;
+            case 'error': // Add this case
+                console.log('Handling error message:', data);
+                handleErrorMessage(data);
+                break;
+            default:
+                console.warn('Unhandled message type:', data.type);
         }
-    };
+    } catch (error) {
+        console.error('Error handling WebSocket message:', error);
+    }
+};
+
+function handleErrorMessage(data) {
+    console.error('Error from server:', data.message);
+    displayMessage(`Error: ${data.message}`);
+    triggerErrorAnimation('messages', data.message); // Visual indication of the error
 }
 
-// Call this function initially to bind event handlers
-initializeWebSocket();
+function handleGameStateUpdate(data) {
+    console.log('Rendering gameStateUpdate:', data);
+    const { tree, katex, score, isComplete, difficulty } = data.state;
+
+    if (katex) {
+        console.log('Rendering KaTeX expression:', katex);
+        renderWithAnimation('currentExpression', katex);
+    } else {
+        console.warn('No expression tree provided in gameStateUpdate');
+    }
+
+    if (score !== undefined) {
+        console.log('Updating score:', score);
+        const scoreElement = document.getElementById('currentScore');
+        if (scoreElement) scoreElement.textContent = score;
+        else console.warn('Score element not found');
+    }
+
+    if (isComplete !== undefined) {
+        console.log('Game completion status:', isComplete);
+        const message = isComplete
+            ? 'Congratulations! You have completed the challenge!'
+            : 'Keep going! The game continues.';
+        displayMessage(message);
+    }
+
+    if (difficulty) {
+        console.log('Updating difficulty multiplier:', difficulty);
+        const multiplierElement = document.getElementById('difficultyMultiplier');
+        if (multiplierElement) multiplierElement.textContent = `${difficulty}x`;
+        else console.warn('Difficulty multiplier element not found');
+    }
+}

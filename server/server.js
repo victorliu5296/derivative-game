@@ -3,7 +3,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { handleWebSocketConnection } from './wsHandler.js';
+import { handleWebSocketConnection } from './wsManager.js';
 
 // Get the current directory equivalent to __dirname in CommonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -21,10 +21,15 @@ const wss = new WebSocketServer({ server });
 
 // Handle WebSocket connections
 wss.on('connection', (ws) => {
+    console.log('New client connected');
     handleWebSocketConnection(ws);
+
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
 });
 
 // Start the server
 server.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
+    console.log(`Server is listening on http://localhost:${PORT}`);
 });
