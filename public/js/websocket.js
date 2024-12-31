@@ -1,5 +1,6 @@
 import { getRoomId } from './room.js';
 import { renderWithAnimation, displayMessage, triggerErrorAnimation } from './ui.js';
+import { gameConfig } from '../config/gameConfig.js';
 
 const room = getRoomId();
 
@@ -97,7 +98,7 @@ function handleGameStateUpdate(data) {
     if (difficulty) {
         console.log('Updating difficulty multiplier:', difficulty);
         const multiplierElement = document.getElementById('difficultyMultiplier');
-        if (multiplierElement) multiplierElement.textContent = `${difficulty}x`;
+        if (multiplierElement) multiplierElement.textContent = `${gameConfig.difficultyMultipliers[difficulty]}x`;
         else console.warn('Difficulty multiplier element not found');
     }
 }

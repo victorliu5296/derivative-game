@@ -1,5 +1,6 @@
 import WebSocket from 'ws';
 import { initializeGameState, applyRuleToGameState, resetGameState, getGameState } from './unused/gameEngine.js';
+import { gameConfig } from '../public/config/gameConfig.js';
 
 const rooms = {};
 
@@ -46,7 +47,7 @@ export function handleWebSocketConnection(ws) {
         if (!rooms[currentRoom]) {
             rooms[currentRoom] = {
                 clients: [],
-                gameState: initializeGameState(currentRoom, data.difficulty || 'medium'),
+                gameState: initializeGameState(currentRoom, data.difficulty || gameConfig.defaultDifficulty),
             };
         }
 

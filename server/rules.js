@@ -12,6 +12,8 @@ import { applyConstantRule } from './derivativeRules.js';
 import { applyExpRule, applyLogRule } from './functionDerivatives.js';
 import { applySinRule, applyCosRule, applyTanRule } from './functionDerivatives.js';
 
+import { gameConfig } from '../public/config/gameConfig.js';
+
 // Centralized rule map
 const ruleMap = {
     simplify: simplifyExpression,
@@ -59,32 +61,9 @@ export function applyRuleRecursively(tree, ruleFunction) {
     return { result, ruleApplied };
 }
 
-// Score calculation
 export function calculateScore(currentScore, difficulty, rule) {
-    const ruleScores = {
-        simplify: 5,
-        linearity: 5,
-        power: 10,
-        chain: 15,
-        product: 20,
-        quotient: 25,
-        constant: 5,
-        exp: 15,
-        ln: 15,
-        sin: 10,
-        cos: 10,
-        tan: 15,
-    };
-
-    const difficultyMultiplier = {
-        easy: 1,
-        medium: 1.5,
-        hard: 2,
-        expert: 3,
-    };
-
-    const baseScore = ruleScores[rule] || 0;
-    const multiplier = difficultyMultiplier[difficulty] || 1;
+    const baseScore = gameConfig.ruleScores[rule] || 0;
+    const multiplier = gameConfig.difficultyMultipliers[difficulty] || 1;
 
     return currentScore + baseScore * multiplier;
 }
