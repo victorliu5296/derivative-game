@@ -63,10 +63,12 @@ export function handleWebSocketConnection(ws) {
         broadcastToRoom(currentRoom, { type: 'gameStateUpdate', state: updatedState });
     }
 
-    function handleReset() {
+    function handleReset(data) {
         if (!currentRoom) throw new Error('No current room');
 
-        const resetState = resetGameState(currentRoom);
+        const selectedDifficulty = data.difficulty || gameStates[currentRoom].difficulty; // Default to current difficulty
+        const resetState = resetGameState(currentRoom, selectedDifficulty);
+
         broadcastToRoom(currentRoom, { type: 'gameStateUpdate', state: resetState });
     }
 

@@ -24,6 +24,25 @@ export function initializeUI() {
         console.log(`Button clicked for rule: ${rule}`);
         sendSocketMessage('applyRule', { rule });
     });
+
+    const difficultySelect = document.getElementById('difficultySelect');
+    const newExpressionButton = document.getElementById('newExpressionButton');
+    const currentDifficultyElement = document.getElementById('currentDifficulty');
+
+    // Update difficulty indicator dynamically
+    difficultySelect.addEventListener('change', () => {
+        console.log(`Selected difficulty: ${difficultySelect.value}`);
+    });
+
+    // Handle "Get New Expression" button click
+    newExpressionButton.addEventListener('click', () => {
+        const selectedDifficulty = difficultySelect.value;
+        console.log(`Requesting new expression with difficulty: ${selectedDifficulty}`);
+        sendSocketMessage('reset', { difficulty: selectedDifficulty });
+
+        // Update current difficulty indicator
+        currentDifficultyElement.textContent = selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
+    });
 }
 
 function setupButtons(buttonId, callback) {

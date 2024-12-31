@@ -47,14 +47,19 @@ export function applyRuleToGameState(roomId, rule) {
 }
 
 // Reset game state
-export function resetGameState(roomId) {
+export function resetGameState(roomId, difficulty) {
     if (!gameStates[roomId]) {
-        throw new Error(`Game state for room ${roomId} not found`);
+        throw new Error(`Game state for room ${roomId} not found.`);
     }
 
-    console.log(`Resetting game for room: ${roomId}`);
-    const difficulty = gameStates[roomId].difficulty;
-    return initializeGameState(roomId, difficulty);
+    const currentScore = gameStates[roomId].score; // Preserve current score
+    const isComplete = false; // Reset completion status
+    const newGameState = initializeGameState(roomId, difficulty);
+
+    // Merge the preserved score and reset completion status into the new game state
+    gameStates[roomId] = { ...newGameState, score: currentScore, isComplete };
+
+    return getGameState(roomId);
 }
 
 // Apply derivative rule
