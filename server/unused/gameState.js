@@ -1,7 +1,7 @@
-import { generateRandomFunction } from './randomFunctionGenerator.js';
-import { toKaTeX } from './toKaTeX.js';
+import { generateRandomFunction } from '../randomFunctionGenerator.js';
+import { toKaTeX } from '../toKaTeX.js';
 import { applyDerivativeRule } from './gameLogic.js';
-import { getDifficultySettings } from './difficultySettings.js';
+import { getDifficultySettings } from '../difficultySettings.js';
 
 const gameStates = {};
 
