@@ -20,9 +20,6 @@
     <h1>Derivative Math Game</h1>
     <p id="messages"></p>
 
-    <!-- Button to get new random expression -->
-    <button id="newExpressionButton">Get New Expression</button>
-
     <div id="difficultySettings">
         <label for="difficulty">Difficulty Level:</label>
         <select id="difficultySelect" name="difficulty">
@@ -31,6 +28,20 @@
             <option value="hard">Hard</option>
             <option value="expert">Expert</option>
         </select>
+        <button id="newExpressionButton">Get New Expression</button>
+    </div>
+
+    <div id="scoreDisplay" class="score-container">
+        <div class="score-info">
+            <h3>Score: <span id="currentScore">0</span></h3>
+            <div class="last-points">
+                <span id="lastPointsEarned"></span>
+            </div>
+        </div>
+        <div class="score-stats">
+            <p>Current Difficulty: <span id="currentDifficulty">Medium</span></p>
+            <p>Difficulty Multiplier: <span id="difficultyMultiplier">1x</span></p>
+        </div>
     </div>
 
     <!-- Score Display -->
