@@ -1,9 +1,10 @@
 import { getRoomId } from './room.js';
 import { renderWithAnimation, displayMessage, triggerErrorAnimation } from './ui.js';
 import { gameConfig } from '../config/gameConfig.js';
-import { getTranslation } from './translations.js';
+import { getTranslation, addLanguageChangeListener } from './translations.js';
 
 let socket;
+let latestMessage = '';
 
 export function initializeWebSocket() {
     const room = getRoomId();
@@ -16,6 +17,7 @@ export function initializeWebSocket() {
     socket.onopen = function () {
         console.log('Connected to WebSocket server');
         displayMessage(getTranslation('connected'));
+        latestMessage = 'connected';
 
         const joinMessage = {
             type: 'join',
@@ -38,11 +40,15 @@ export function initializeWebSocket() {
     socket.onclose = function () {
         console.log('Disconnected from WebSocket server');
         displayMessage(getTranslation('disconnected'));
+        latestMessage = 'disconnected';
     };
 
     socket.onerror = function (error) {
         console.error('WebSocket error observed:', error);
     };
+
+    // Listen for language changes and retranslate messages
+    addLanguageChangeListener(retranslateMessages);
 }
 
 export function sendSocketMessage(type, data = {}) {
@@ -63,13 +69,11 @@ function handleServerMessage(data) {
             break;
         case 'message':
             console.log('Handling message:', data.message);
-            displayMessage(data.message);
-            break;
-        case 'simplificationStatus':
-            console.log('Handling simplificationStatus:', data);
-            if (data.status === 'alreadyApplied') {
-                triggerErrorAnimation('simplifyButton', 'Simplification already applied');
-            }
+            const { messageId, params } = data;
+            latestMessage = messageId;
+
+            const translatedMessage = getTranslation(messageId, params || {});
+            displayMessage(translatedMessage);
             break;
         case 'error':
             console.log('Handling error message:', data);
@@ -80,9 +84,16 @@ function handleServerMessage(data) {
     }
 }
 
+function retranslateMessages() {
+    console.log('Retranslating stored messages:', latestMessage);
+    const translatedMessage = getTranslation(latestMessage);
+    displayMessage(translatedMessage);
+}
+
 function handleErrorMessage(data) {
     console.error('Error from server:', data.message);
     displayMessage(`Error: ${data.message}`);
+    latestMessage = 'error';
     triggerErrorAnimation('messages', data.message); // Visual indication of the error
 }
 
@@ -93,6 +104,7 @@ function handleGameStateUpdate(data) {
     if (katex) {
         console.log('Rendering KaTeX expression:', katex);
         renderWithAnimation('currentExpression', katex);
+
     } else {
         console.warn('No expression tree provided in gameStateUpdate');
     }
@@ -107,9 +119,10 @@ function handleGameStateUpdate(data) {
     if (isComplete !== undefined) {
         console.log('Game completion status:', isComplete);
         const message = isComplete
-            ? getTranslation('congratulations')
-            : getTranslation('keepGoing');
-        displayMessage(message);
+            ? 'congratulations'
+            : 'keepGoing';
+        latestMessage = message;
+        displayMessage(getTranslation(message));
     }
 
     if (difficulty) {

@@ -33,13 +33,20 @@
 
     <div id="scoreDisplay" class="score-container">
         <div class="score-info">
-            <h3 id="scoreTitle" data-translation-key="score">Score: <span id="currentScore">0</span></h3>
+            <h3 id="scoreTitle">
+                <span data-translation-key="score">Score:</span>
+                <span id="currentScore">0</span>
+            </h3>
         </div>
         <div class="score-stats">
-            <p id="currentDifficultyLabel" data-translation-key="currentDifficulty">Current Difficulty: <span
-                    id="currentDifficulty">Easy</span></p>
-            <p id="difficultyMultiplierLabel" data-translation-key="difficultyMultiplier">Difficulty Multiplier: <span
-                    id="difficultyMultiplier">1x</span></p>
+            <p id="currentDifficultyLabel">
+                <span data-translation-key="currentDifficulty">Current Difficulty:</span>
+                <span id="currentDifficulty">Easy</span>
+            </p>
+            <p id="difficultyMultiplierLabel">
+                <span data-translation-key="difficultyMultiplier">Difficulty Multiplier:</span>
+                <span id="difficultyMultiplier">1x</span>
+            </p>
         </div>
     </div>
 
@@ -55,12 +62,16 @@
     <div id="derivativeRules">
         <h3 id="derivativeRulesTitle" data-translation-key="derivativeRules">Derivative Rules:</h3>
         <div class="button-container">
-            <button id="linearityRuleButton" data-translation-key="applyLinearityRule">Apply Linearity Rule</button>
-            <button id="powerRuleButton" data-translation-key="applyPowerRule">Apply Power Rule</button>
-            <button id="chainRuleButton" data-translation-key="applyChainRule">Apply Chain Rule</button>
-            <button id="productRuleButton" data-translation-key="applyProductRule">Apply Product Rule</button>
-            <button id="quotientRuleButton" data-translation-key="applyQuotientRule">Apply Quotient Rule</button>
-            <button id="constantRuleButton" data-translation-key="applyConstantRule">Apply Constant Rule</button>
+            <button id="linearityRuleButton" data-math-key="applyLinearityRule">\( \frac{d}{dx} [af(x) + bg(x)] = a
+                \cdot f'(x) + b \cdot g'(x) \)</button>
+            <button id="powerRuleButton" data-math-key="applyPowerRule">\( \frac{d}{dx} x^n = n x^{n-1} \)</button>
+            <button id="chainRuleButton" data-math-key="applyChainRule">\( \frac{d}{dx} f(g(x)) = f'(g(x)) \cdot g'(x)
+                \)</button>
+            <button id="productRuleButton" data-math-key="applyProductRule">\( \frac{d}{dx} [f(x) \cdot g(x)] = f'(x)
+                \cdot g(x) + f(x) \cdot g'(x) \)</button>
+            <button id="quotientRuleButton" data-math-key="applyQuotientRule">\( \frac{d}{dx} \frac{f(x)}{g(x)} =
+                \frac{f'(x) \cdot g(x) - f(x) \cdot g'(x)}{[g(x)]^2} \)</button>
+            <button id="constantRuleButton" data-math-key="applyConstantRule">\( \frac{d}{dx} c = 0 \)</button>
         </div>
     </div>
 
@@ -69,30 +80,39 @@
 
         <fieldset>
             <legend data-translation-key="exponentialAndLogarithmic">Exponential and Logarithmic Functions</legend>
-            <button id="exponentialFunctionButton" data-translation-key="exponentialFunction">Exponential
-                Function</button>
-            <button id="logarithmicFunctionButton" data-translation-key="logarithmicFunction">Logarithmic
-                Function</button>
+            <button id="exponentialFunctionButton" data-math-key="exponentialFunction">\( \frac{d}{dx} e^{f(x)} =
+                e^{f(x)}
+                \cdot f'(x) \)</button>
+            <button id="logarithmicFunctionButton" data-math-key="logarithmicFunction">\( \frac{d}{dx} \ln(f(x)) =
+                \frac{1}{f(x)} \cdot f'(x) \)</button>
         </fieldset>
 
         <fieldset>
             <legend data-translation-key="trigonometricFunctions">Trigonometric Functions</legend>
             <div>
-                <button id="rewriteRecipTrigFunctionsButton" data-translation-key="rewriteRecipTrigFunctions">Rewrite
-                    Reciprocal Trigonometric Functions</button>
+                <span data-translation-key="rewriteRecipTrigFunctions">Rewrite Reciprocal Trigonometric
+                    Functions: </span>
+                <button id="rewriteRecipTrigFunctionsButton" data-math-key="rewriteRecipTrigFunctions">
+                    Placeholder
+                </button>
             </div>
             <div id="trigonometricFunctionsButtons">
-                <button id="sineFunctionButton" data-translation-key="sineFunction">Sine Function</button>
-                <button id="cosineFunctionButton" data-translation-key="cosineFunction">Cosine Function</button>
-                <button id="tangentFunctionButton" data-translation-key="tangentFunction">Tangent Function</button>
+                <button id="sineFunctionButton" data-math-key="sineFunction">\( \frac{d}{dx} \sin(x) = \cos(x)
+                    \)</button>
+                <button id="cosineFunctionButton" data-math-key="cosineFunction">\( \frac{d}{dx} \cos(x) = -\sin(x)
+                    \)</button>
+                <button id="tangentFunctionButton" data-math-key="tangentFunction">\( \frac{d}{dx} \tan(x) =
+                    \sec^2(x)
+                    \)</button>
             </div>
             <div id="inverseTrigonometricFunctionsButtons">
-                <button id="inverseSineFunctionButton" data-translation-key="inverseSineFunction">Inverse Sine
-                    Function</button>
-                <button id="inverseCosineFunctionButton" data-translation-key="inverseCosineFunction">Inverse Cosine
-                    Function</button>
-                <button id="inverseTangentFunctionButton" data-translation-key="inverseTangentFunction">Inverse Tangent
-                    Function</button>
+                <button id="inverseSineFunctionButton" data-math-key="inverseSineFunction">\( \frac{d}{dx}
+                    \sin^{-1}(x) =
+                    \frac{1}{\sqrt{1-x^2}} \)</button>
+                <button id="inverseCosineFunctionButton" data-math-key="inverseCosineFunction">\( \frac{d}{dx}
+                    \cos^{-1}(x) = \frac{-1}{\sqrt{1-x^2}} \)</button>
+                <button id="inverseTangentFunctionButton" data-math-key="inverseTangentFunction">\( \frac{d}{dx}
+                    \tan^{-1}(x) = \frac{1}{1+x^2} \)</button>
             </div>
         </fieldset>
     </div>
