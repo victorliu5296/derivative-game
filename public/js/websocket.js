@@ -113,7 +113,10 @@ function handleGameStateUpdate(data) {
     }
 
     if (difficulty) {
-        console.log('Updating difficulty multiplier:', difficulty);
+        console.log('Updating difficulty:', difficulty);
+        const difficultyElement = document.getElementById('currentDifficulty');
+        if (difficultyElement) difficultyElement.textContent = getTranslation(`difficulty${capitalizeFirstLetter(difficulty)}`);
+        else console.warn('Difficulty element not found');
         const multiplierElement = document.getElementById('difficultyMultiplier');
         if (multiplierElement) multiplierElement.textContent = `${gameConfig.difficultyMultipliers[difficulty]}x`;
         else console.warn('Difficulty multiplier element not found');
