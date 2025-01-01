@@ -11,29 +11,35 @@ export async function updateLanguage(language) {
     currentLanguage = language;
     translations = await loadTranslations(language);
 
-    return new Promise((resolve) => {
-        // Update all static elements
-        document.querySelectorAll('[data-translation-key]').forEach((element) => {
-            const key = element.getAttribute('data-translation-key');
-            if (translations[key]) {
-                if (element.tagName === 'TITLE') {
-                    document.title = translations[key];
-                } else {
-                    element.innerHTML = translations[key];
-                }
+    document.querySelectorAll('[data-translation-key]').forEach((element) => {
+        const key = element.getAttribute('data-translation-key');
+        if (translations[key]) {
+            if (element.tagName === 'TITLE') {
+                document.title = translations[key];
+            } else {
+                // Preserve child elements like <span>
+                const spanElements = element.querySelectorAll('span');
+                const translation = translations[key];
+
+                // Replace only text outside <span>
+                element.childNodes.forEach((node) => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        node.textContent = translation; // Update translation
+                    }
+                });
+
+                // Re-attach spans (or leave them untouched if already correct)
+                spanElements.forEach(span => element.appendChild(span));
             }
-        });
+        }
+    });
 
-        // Render KaTeX
-        renderMathInElement(document.body, {
-            delimiters: [
-                { left: "\\(", right: "\\)", display: false },
-                { left: "\\[", right: "\\]", display: true },
-            ],
-        });
-
-        console.log('Language updated:', language);
-        resolve(); // Resolve the promise when done
+    // Render KaTeX
+    renderMathInElement(document.body, {
+        delimiters: [
+            { left: "\\(", right: "\\)", display: false },
+            { left: "\\[", right: "\\]", display: true },
+        ],
     });
 }
 

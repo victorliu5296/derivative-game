@@ -122,3 +122,7 @@ function handleGameStateUpdate(data) {
         else console.warn('Difficulty multiplier element not found');
     }
 }
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
