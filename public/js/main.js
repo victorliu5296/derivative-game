@@ -15,6 +15,11 @@ async function main() {
     // Step 3: Initialize WebSocket
     initializeWebSocket();
     console.log('WebSocket initialized');
+
+    // Language switcher buttons
+    document.getElementById('langEn').addEventListener('click', () => updateLanguage('en'));
+    document.getElementById('langFr').addEventListener('click', () => updateLanguage('fr'));
+    document.getElementById('langEs').addEventListener('click', () => updateLanguage('es'));
 }
 
 // Run the main function after DOM content is loaded
