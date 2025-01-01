@@ -1,8 +1,10 @@
-import { socket } from './websocket.js';
+import { sendSocketMessage } from "./websocket.js";
+
+const ANIMATION_DURATION = 1000; // Animation duration in milliseconds
 
 export function initializeUI() {
     const ruleButtons = [
-        { id: 'simplifyButton', rule: 'simplify' }, // Simplify is treated as a rule
+        { id: 'simplifyButton', rule: 'simplify' },
         { id: 'rewriteRecipTrigFunctionsButton', rule: 'rewriteRecipTrigFunctions' },
         { id: 'powerRuleButton', rule: 'power' },
         { id: 'productRuleButton', rule: 'product' },
@@ -45,7 +47,7 @@ export function initializeUI() {
     });
 }
 
-function setupButtons(buttonId, callback) {
+function setupButton(buttonId, callback) {
     const button = document.getElementById(buttonId);
     if (button) {
         console.log(`Setting up button with ID: ${buttonId}`);
@@ -57,17 +59,11 @@ function setupButtons(buttonId, callback) {
 
 function setupMultipleButtons(buttonConfigs, callback) {
     buttonConfigs.forEach(({ id, rule }) => {
-        setupButtons(id, () => callback(rule));
+        setupButton(id, () => callback(rule));
     });
 }
 
-function sendSocketMessage(type, data = {}) {
-    const message = { type, ...data };
-    console.log(`Sending WebSocket message:`, message);
-    socket.send(JSON.stringify(message));
-}
-
-export function renderWithAnimation(elementId, latexString) {
+export function renderWithAnimation(elementId, katexString) {
     const element = document.getElementById(elementId);
 
     if (!element) {
@@ -75,10 +71,10 @@ export function renderWithAnimation(elementId, latexString) {
         return;
     }
 
-    console.log(`Rendering LaTeX string for element ${elementId}:`, latexString);
+    console.log(`Rendering KaTeX string for element ${elementId}:`, katexString);
     element.textContent = ''; // Clear previous content
     element.classList.remove('animate'); // Remove the animation class
-    katex.render(latexString, element, { throwOnError: false }); // Render the LaTeX
+    katex.render(katexString, element, { throwOnError: false }); // Render the KaTeX
 
     void element.offsetWidth; // Trigger reflow to restart animation
     element.classList.add('animate'); // Add animation class
@@ -99,7 +95,7 @@ export function triggerErrorAnimation(elementId, errorMessage) {
     if (element) {
         console.log(`Triggering error animation for ${elementId}:`, errorMessage);
         element.classList.add('shake-error');
-        setTimeout(() => element.classList.remove('shake-error'), 1000); // Remove animation after 1 second
+        setTimeout(() => element.classList.remove('shake-error'), ANIMATION_DURATION);
     } else {
         console.error(`Element with ID ${elementId} not found for error animation`);
     }

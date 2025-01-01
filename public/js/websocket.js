@@ -1,67 +1,84 @@
 import { getRoomId } from './room.js';
 import { renderWithAnimation, displayMessage, triggerErrorAnimation } from './ui.js';
 import { gameConfig } from '../config/gameConfig.js';
+import { getTranslation } from './translations.js';
 
-const room = getRoomId();
+let socket;
 
-const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-const host = window.location.host.includes('localhost') ? 'localhost:3000' : window.location.host;
+export function initializeWebSocket() {
+    const room = getRoomId();
 
-export const socket = new WebSocket(`${protocol}//${host}`);
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host.includes('localhost') ? 'localhost:3000' : window.location.host;
 
-socket.onopen = function () {
-    console.log('Connected to WebSocket server');
-    displayMessage('Connected to the server!');
+    socket = new WebSocket(`${protocol}//${host}`);
 
-    // Join the room
-    const joinMessage = {
-        type: 'join',
-        room: room,
+    socket.onopen = function () {
+        console.log('Connected to WebSocket server');
+        displayMessage(getTranslation('connected'));
+
+        const joinMessage = {
+            type: 'join',
+            room: room,
+        };
+        console.log('Sending join message:', joinMessage);
+        socket.send(JSON.stringify(joinMessage));
     };
-    console.log('Sending join message:', joinMessage);
-    socket.send(JSON.stringify(joinMessage));
-};
 
-socket.onclose = function () {
-    console.log('Disconnected from WebSocket server');
-    displayMessage('Disconnected from the server');
-};
-
-socket.onerror = function (error) {
-    console.error('WebSocket error observed:', error);
-};
-
-socket.onmessage = function (event) {
-    console.log('Message received from server:', event.data);
-    try {
-        const data = JSON.parse(event.data);
-
-        switch (data.type) {
-            case 'gameStateUpdate':
-                console.log('Handling gameStateUpdate:', data);
-                handleGameStateUpdate(data);
-                break;
-            case 'message':
-                console.log('Handling message:', data.message);
-                displayMessage(data.message);
-                break;
-            case 'simplificationStatus':
-                console.log('Handling simplificationStatus:', data);
-                if (data.status === 'alreadyApplied') {
-                    triggerErrorAnimation('simplifyButton', 'Simplification already applied');
-                }
-                break;
-            case 'error': // Add this case
-                console.log('Handling error message:', data);
-                handleErrorMessage(data);
-                break;
-            default:
-                console.warn('Unhandled message type:', data.type);
+    socket.onmessage = function (event) {
+        console.log('Message received from server:', event.data);
+        try {
+            const data = JSON.parse(event.data);
+            handleServerMessage(data);
+        } catch (error) {
+            console.error('Error handling WebSocket message:', error);
         }
-    } catch (error) {
-        console.error('Error handling WebSocket message:', error);
+    };
+
+    socket.onclose = function () {
+        console.log('Disconnected from WebSocket server');
+        displayMessage(getTranslation('disconnected'));
+    };
+
+    socket.onerror = function (error) {
+        console.error('WebSocket error observed:', error);
+    };
+}
+
+export function sendSocketMessage(type, data = {}) {
+    if (!socket) {
+        console.error('Socket not initialized');
+        return;
     }
-};
+    const message = { type, ...data };
+    console.log(`Sending WebSocket message:`, message);
+    socket.send(JSON.stringify(message));
+}
+
+function handleServerMessage(data) {
+    switch (data.type) {
+        case 'gameStateUpdate':
+            console.log('Handling gameStateUpdate:', data);
+            handleGameStateUpdate(data);
+            break;
+        case 'message':
+            console.log('Handling message:', data.message);
+            displayMessage(data.message);
+            break;
+        case 'simplificationStatus':
+            console.log('Handling simplificationStatus:', data);
+            if (data.status === 'alreadyApplied') {
+                triggerErrorAnimation('simplifyButton', 'Simplification already applied');
+            }
+            break;
+        case 'error':
+            console.log('Handling error message:', data);
+            handleErrorMessage(data);
+            break;
+        default:
+            console.warn('Unhandled message type:', data.type);
+    }
+}
 
 function handleErrorMessage(data) {
     console.error('Error from server:', data.message);
@@ -90,8 +107,8 @@ function handleGameStateUpdate(data) {
     if (isComplete !== undefined) {
         console.log('Game completion status:', isComplete);
         const message = isComplete
-            ? 'Congratulations! You have completed the challenge!'
-            : 'Keep going! The game continues.';
+            ? getTranslation('congratulations')
+            : getTranslation('keepGoing');
         displayMessage(message);
     }
 

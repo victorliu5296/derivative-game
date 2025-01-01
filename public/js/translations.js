@@ -5,59 +5,44 @@ export async function loadTranslations(language) {
     return await response.json();
 }
 
+export let translations = {};
+
 export async function updateLanguage(language) {
     currentLanguage = language;
-    const translations = await loadTranslations(language);
+    translations = await loadTranslations(language);
 
-    // Define a mapping of element IDs/selectors to their translation keys
-    const elementTranslations = {
-        'title': ['title', 'title'], // [selector, translationKey]
-        'h1': ['h1', 'title'],
-        'h2': ['h2', 'currentFunction'],
-        'simplifyButton': ['#simplifyButton', 'simplifyButton'],
-
-        // Derivative rule buttons
-        'linearityRuleButton': ['#linearityRuleButton', 'applyLinearityRule'],
-        'powerRuleButton': ['#powerRuleButton', 'applyPowerRule'],
-        'chainRuleButton': ['#chainRuleButton', 'applyChainRule'],
-        'productRuleButton': ['#productRuleButton', 'applyProductRule'],
-        'quotientRuleButton': ['#quotientRuleButton', 'applyQuotientRule'],
-        'constantRuleButton': ['#constantRuleButton', 'applyConstantRule'],
-
-        // Fieldset legends
-        'fieldsetLegend1': ['fieldset legend', 'exponentialAndLogarithmic'],
-        'fieldsetLegend2': ['fieldset:nth-of-type(2) legend', 'trigonometricFunctions'],
-
-        // Function buttons
-        'exponentialFunctionButton': ['#exponentialFunctionButton', 'exponentialFunction'],
-        'logarithmicFunctionButton': ['#logarithmicFunctionButton', 'logarithmicFunction'],
-        'rewriteRecipTrigFunctionsButton': ['#rewriteRecipTrigFunctionsButton', 'rewriteRecipTrigFunctions'],
-        'sineFunctionButton': ['#sineFunctionButton', 'sineFunction'],
-        'cosineFunctionButton': ['#cosineFunctionButton', 'cosineFunction'],
-        'tangentFunctionButton': ['#tangentFunctionButton', 'tangentFunction'],
-        'inverseSineFunctionButton': ['#inverseSineFunctionButton', 'inverseSineFunction'],
-        'inverseCosineFunctionButton': ['#inverseCosineFunctionButton', 'inverseCosineFunction'],
-        'inverseTangentFunctionButton': ['#inverseTangentFunctionButton', 'inverseTangentFunction'],
-        'messages': ['#messages', 'connected']
-    };
-
-    // Update all elements
-    Object.entries(elementTranslations).forEach(([key, [selector, translationKey]]) => {
-        if (selector === 'title') {
-            document.title = translations[translationKey];
-        } else {
-            const element = document.querySelector(selector);
-            if (element) {
-                element.textContent = translations[translationKey];
+    return new Promise((resolve) => {
+        // Update all static elements
+        document.querySelectorAll('[data-translation-key]').forEach((element) => {
+            const key = element.getAttribute('data-translation-key');
+            if (translations[key]) {
+                if (element.tagName === 'TITLE') {
+                    document.title = translations[key];
+                } else {
+                    element.innerHTML = translations[key];
+                }
             }
-        }
-    });
+        });
 
-    // Render KaTeX in all relevant elements
-    renderMathInElement(document.body, {
-        delimiters: [
-            { left: "\\(", right: "\\)", display: false },
-            { left: "\\[", right: "\\]", display: true }
-        ]
+        // Render KaTeX
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true },
+            ],
+        });
+
+        console.log('Language updated:', language);
+        resolve(); // Resolve the promise when done
     });
+}
+
+export function getTranslation(key, params = {}) {
+    if (!translations[key]) {
+        console.warn(`Translation key not found: ${key}`);
+        return `404 - [${key}]`; // Fallback to a placeholder for missing translations
+    }
+    return Object.keys(params).reduce((msg, param) => {
+        return msg.replace(`{${param}}`, params[param]);
+    }, translations[key]);
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Derivative Math Game</title>
+    <title data-translation-key="title">Derivative Math Game</title>
     <!-- Include KaTeX CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -17,97 +17,91 @@
         <button id="langEs">Español</button>
     </div>
 
-    <h1>Derivative Math Game</h1>
+    <h1 id="gameTitle" data-translation-key="title">Derivative Math Game</h1>
     <p id="messages"></p>
 
     <div id="difficultySettings">
-        <label for="difficulty">Difficulty Level:</label>
+        <label for="difficulty" id="difficultyLabel" data-translation-key="difficultyLabel">Difficulty Level:</label>
         <select id="difficultySelect" name="difficulty">
-            <option value="easy">Easy</option>
-            <option value="medium" selected>Medium</option>
-            <option value="hard">Hard</option>
-            <option value="expert">Expert</option>
+            <option value="easy" data-translation-key="difficultyEasy">Easy</option>
+            <option value="medium" data-translation-key="difficultyMedium" selected>Medium</option>
+            <option value="hard" data-translation-key="difficultyHard">Hard</option>
+            <option value="expert" data-translation-key="difficultyExpert">Expert</option>
         </select>
-        <button id="newExpressionButton">Get New Expression</button>
+        <button id="newExpressionButton" data-translation-key="newExpressionButton">Get New Expression</button>
     </div>
 
     <div id="scoreDisplay" class="score-container">
         <div class="score-info">
-            <h3>Score: <span id="currentScore">0</span></h3>
-            <div class="last-points">
-                <span id="lastPointsEarned"></span>
-            </div>
+            <h3 id="scoreTitle" data-translation-key="score">Score: <span id="currentScore">0</span></h3>
         </div>
         <div class="score-stats">
-            <p>Current Difficulty: <span id="currentDifficulty">Medium</span></p>
-            <p>Difficulty Multiplier: <span id="difficultyMultiplier">1x</span></p>
+            <p id="currentDifficultyLabel" data-translation-key="currentDifficulty">Current Difficulty: <span
+                    id="currentDifficulty">Easy</span></p>
+            <p id="difficultyMultiplierLabel" data-translation-key="difficultyMultiplier">Difficulty Multiplier: <span
+                    id="difficultyMultiplier">1x</span></p>
         </div>
     </div>
 
-    <!-- Display the Current Expression -->
     <div id="currentExpression-container">
-        <h2>Current Expression:</h2>
+        <h2 data-translation-key="currentFunction">Current Expression:</h2>
         <p id="currentExpression" class="fade-scale-in"></p>
     </div>
 
-    <!-- Simplify Button -->
     <div>
-        <button id="simplifyButton">Simplify Expression</button>
+        <button id="simplifyButton" data-translation-key="simplifyButton">Simplify Expression</button>
     </div>
 
-    <!-- Derivative Rule Buttons -->
     <div id="derivativeRules">
-        <h3 id="derivativeRulesTitle">Derivative Rules:</h3>
+        <h3 id="derivativeRulesTitle" data-translation-key="derivativeRules">Derivative Rules:</h3>
         <div class="button-container">
-            <button id="linearityRuleButton">Apply Linearity Rule</button>
-            <button id="powerRuleButton">Apply Power Rule</button>
-            <button id="chainRuleButton">Apply Chain Rule</button>
-            <button id="productRuleButton">Apply Product Rule</button>
-            <button id="quotientRuleButton">Apply Quotient Rule</button>
-            <button id="constantRuleButton">Apply Constant Rule</button>
+            <button id="linearityRuleButton" data-translation-key="applyLinearityRule">Apply Linearity Rule</button>
+            <button id="powerRuleButton" data-translation-key="applyPowerRule">Apply Power Rule</button>
+            <button id="chainRuleButton" data-translation-key="applyChainRule">Apply Chain Rule</button>
+            <button id="productRuleButton" data-translation-key="applyProductRule">Apply Product Rule</button>
+            <button id="quotientRuleButton" data-translation-key="applyQuotientRule">Apply Quotient Rule</button>
+            <button id="constantRuleButton" data-translation-key="applyConstantRule">Apply Constant Rule</button>
         </div>
     </div>
 
-    <!-- Function Derivative Buttons -->
     <div id="functionDerivativeButtons">
-        <h3 id="functionDerivativesTitle">Function Derivatives:</h3>
+        <h3 id="functionDerivativesTitle" data-translation-key="functionDerivatives">Function Derivatives:</h3>
 
-        <!-- Fieldset for Exponential and Logarithmic functions -->
         <fieldset>
-            <legend>Exponential and Logarithmic Functions</legend>
-            <button id="exponentialFunctionButton">Exponential Function</button>
-            <button id="logarithmicFunctionButton">Logarithmic Function</button>
+            <legend data-translation-key="exponentialAndLogarithmic">Exponential and Logarithmic Functions</legend>
+            <button id="exponentialFunctionButton" data-translation-key="exponentialFunction">Exponential
+                Function</button>
+            <button id="logarithmicFunctionButton" data-translation-key="logarithmicFunction">Logarithmic
+                Function</button>
         </fieldset>
 
-        <!-- Fieldset for Trigonometric Functions -->
         <fieldset>
-            <legend>Trigonometric Functions</legend>
+            <legend data-translation-key="trigonometricFunctions">Trigonometric Functions</legend>
             <div>
-                <button id="rewriteRecipTrigFunctionsButton">Rewrite Reciprocal Trigonometric Functions</button>
+                <button id="rewriteRecipTrigFunctionsButton" data-translation-key="rewriteRecipTrigFunctions">Rewrite
+                    Reciprocal Trigonometric Functions</button>
             </div>
             <div id="trigonometricFunctionsButtons">
-                <button id="sineFunctionButton">Sine Function</button>
-                <button id="cosineFunctionButton">Cosine Function</button>
-                <button id="tangentFunctionButton">Tangent Function</button>
+                <button id="sineFunctionButton" data-translation-key="sineFunction">Sine Function</button>
+                <button id="cosineFunctionButton" data-translation-key="cosineFunction">Cosine Function</button>
+                <button id="tangentFunctionButton" data-translation-key="tangentFunction">Tangent Function</button>
             </div>
             <div id="inverseTrigonometricFunctionsButtons">
-                <button id="inverseSineFunctionButton">Inverse Sine Function</button>
-                <button id="inverseCosineFunctionButton">Inverse Cosine Function</button>
-                <button id="inverseTangentFunctionButton">Inverse Tangent Function</button>
+                <button id="inverseSineFunctionButton" data-translation-key="inverseSineFunction">Inverse Sine
+                    Function</button>
+                <button id="inverseCosineFunctionButton" data-translation-key="inverseCosineFunction">Inverse Cosine
+                    Function</button>
+                <button id="inverseTangentFunctionButton" data-translation-key="inverseTangentFunction">Inverse Tangent
+                    Function</button>
             </div>
         </fieldset>
     </div>
 
-    <!-- Include KaTeX JS -->
     <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js"></script>
-
-    <!-- Include MathJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.1.1/math.min.js"></script>
-
-    <!-- Include Modular JavaScript Public Files -->
     <script type="module" src="/js/room.js"></script>
-    <script type="module" src="/js/websocket.js"></script>
+    <script type="module" src="/js/websocket.js" defer></script>
     <script type="module" src="/js/translations.js"></script>
     <script type="module" src="/js/ui.js"></script>
     <script type="module" src="/js/main.js"></script>
