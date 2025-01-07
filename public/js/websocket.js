@@ -1,5 +1,5 @@
 import { getRoomId } from './room.js';
-import { renderWithAnimation, displayMessage, triggerErrorAnimation } from './ui.js';
+import { renderWithAnimation, displayMessage, triggerErrorAnimation, lastAppliedRule } from './ui.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { getTranslation, addLanguageChangeListener } from './translations.js';
 
@@ -100,6 +100,8 @@ function handleErrorMessage(data) {
 function handleGameStateUpdate(data) {
     console.log('Rendering gameStateUpdate:', data);
     const { tree, katex, score, isComplete, difficulty } = data.state;
+
+    lastAppliedRule = null; // Reset the last applied rule
 
     if (katex) {
         console.log('Rendering KaTeX expression:', katex);

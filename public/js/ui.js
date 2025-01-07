@@ -1,7 +1,7 @@
 import { sendSocketMessage } from "./websocket.js";
 import { addLanguageChangeListener, getTranslation } from "./translations.js";
 
-let lastAppliedRule = null; // Tracks the last applied rule
+export let lastAppliedRule = null; // Tracks the last applied rule
 const ANIMATION_DURATION = 1000; // Animation duration in milliseconds
 
 export async function initializeUI() {
