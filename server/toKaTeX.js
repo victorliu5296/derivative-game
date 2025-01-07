@@ -68,11 +68,25 @@ function formatMultiplication(expr) {
     if (left === '1') return right;
     if (right === '1') return left;
 
-    // Omit \cdot for constant coefficients or when multiplying by variables
-    if (expr.left.type === 'constant' || expr.right.type === 'variable') {
+    // Omit \cdot for specific cases
+    if (expr.left.type === 'constant' && expr.right.type === 'variable') {
         return `${left}${right}`;
     }
 
+    if (expr.left.type === 'constant' && expr.right.type === 'function') {
+        return `${left}${right}`;
+    }
+
+    if (expr.left.type === 'variable' && expr.right.type === 'function') {
+        return `${left}${right}`;
+    }
+
+    // Omit \cdot if the right side is pure exponentiation of a variable
+    if (expr.right.type === 'binary' && expr.right.operator === '^' && expr.right.left.type === 'variable') {
+        return `${left}${right}`;
+    }
+
+    // Include \cdot for other cases (e.g., constant * constant or constant * expression with constant coefficient)
     return `${left} \\cdot ${right}`;
 }
 
