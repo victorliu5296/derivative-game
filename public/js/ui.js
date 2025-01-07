@@ -1,6 +1,7 @@
 import { sendSocketMessage } from "./websocket.js";
 import { addLanguageChangeListener, getTranslation } from "./translations.js";
 
+let lastAppliedRule = null; // Tracks the last applied rule
 const ANIMATION_DURATION = 1000; // Animation duration in milliseconds
 
 export async function initializeUI() {
@@ -121,7 +122,19 @@ function setupButton(buttonId, callback) {
 
 function setupMultipleButtons(buttonConfigs, callback) {
     buttonConfigs.forEach(({ id, rule }) => {
-        setupButton(id, () => callback(rule));
+        setupButton(id, () => {
+            if (rule === 'simplify' && lastAppliedRule === 'simplify') {
+                // Trigger error animation if "simplify" is clicked twice in a row
+                triggerErrorAnimation(id, 'You cannot apply "simplify" twice in a row!');
+                return;
+            }
+
+            // Update the last applied rule
+            lastAppliedRule = rule;
+
+            // Execute the callback for the rule
+            callback(rule);
+        });
     });
 }
 
