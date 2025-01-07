@@ -138,6 +138,10 @@ function setupMultipleButtons(buttonConfigs, callback) {
     });
 }
 
+export function resetLastAppliedRule() {
+    lastAppliedRule = null;
+}
+
 export function renderWithAnimation(elementId, katexString) {
     const element = document.getElementById(elementId);
 
