@@ -1,12 +1,12 @@
-import { sendSocketMessage } from "./websocket.js";
-import { addLanguageChangeListener, getTranslation } from "./translations.js";
+// ui.js
+import { eventBus, EVENTS } from './eventBus.js';
+import { getTranslation, addLanguageChangeListener } from "./translations.js";
+import { gameConfig } from '../config/gameConfig.js';
 
-export let lastAppliedRule = null; // Tracks the last applied rule
-const ANIMATION_DURATION = 1000; // Animation duration in milliseconds
+const ANIMATION_DURATION = 1000;
 
 export async function initializeUI() {
     updateUITranslations();
-
     const ruleButtons = [
         { id: 'simplifyButton', rule: 'simplify' },
         { id: 'rewriteRecipTrigFunctionsButton', rule: 'rewriteRecipTrigFunctions' },
@@ -26,54 +26,112 @@ export async function initializeUI() {
         { id: 'inverseTangentFunctionButton', rule: 'arctan' },
     ];
 
-    setupMultipleButtons(ruleButtons, (rule) => {
-        console.log(`Button clicked for rule: ${rule}`);
-        sendSocketMessage('applyRule', { rule });
-    });
+    setupMultipleButtons(ruleButtons, handleRuleButtonClick);
+    setupDifficultyControls();
+    await initializeMathContent();
+    setupEventListeners();
+}
 
+function setupDifficultyControls() {
     const difficultySelect = document.getElementById('difficultySelect');
     const newExpressionButton = document.getElementById('newExpressionButton');
-    const currentDifficultyElement = document.getElementById('currentDifficulty');
 
-    // Update difficulty indicator dynamically
     if (difficultySelect) {
         difficultySelect.addEventListener('change', () => {
             console.log(`Selected difficulty: ${difficultySelect.value}`);
+            updateDifficultyDisplay(difficultySelect.value);
         });
     }
 
-    // Handle "Get New Expression" button click
     if (newExpressionButton) {
         newExpressionButton.addEventListener('click', () => {
             const selectedDifficulty = difficultySelect?.value || 'easy';
-            console.log(`Requesting new expression with difficulty: ${selectedDifficulty}`);
-            sendSocketMessage('reset', { difficulty: selectedDifficulty });
-
-            // Update current difficulty indicator
-            if (currentDifficultyElement) {
-                currentDifficultyElement.textContent =
-                    selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
-            }
+            eventBus.publish(EVENTS.NEW_EXPRESSION_REQUESTED, {
+                difficulty: selectedDifficulty
+            });
+            updateDifficultyDisplay(selectedDifficulty);
         });
     }
-
-    // Inject and render math content once
-    await injectMathContent();
-    renderMathGlobally();
-
-    // React to language changes
-    addLanguageChangeListener(updateUITranslations);
 }
 
-// Function to load translations from JSON files
+function setupEventListeners() {
+    eventBus.subscribe(EVENTS.KATEX_UPDATED, ({ katex }) => {
+        renderWithAnimation('currentExpression', katex);
+    });
+
+    eventBus.subscribe(EVENTS.UI_MESSAGE, ({ message }) => {
+        displayMessage(message);
+    });
+
+    eventBus.subscribe(EVENTS.ERROR_OCCURRED, ({ elementId, message }) => {
+        triggerErrorAnimation(elementId, message);
+    });
+
+    eventBus.subscribe(EVENTS.GAME_STATE_UPDATED, handleGameStateUpdate);
+
+    // Add language change listener
+    addLanguageChangeListener(() => {
+        // Update static translations
+        updateUITranslations();
+
+        // Re-translate current difficulty and multiplier
+        const difficultySelect = document.getElementById('difficultySelect');
+        if (difficultySelect) {
+            const currentDifficulty = difficultySelect.value || 'easy';
+            updateDifficultyDisplay(currentDifficulty);
+        }
+
+        // Re-translate current message if exists
+        const messagesElement = document.getElementById('messages');
+        if (messagesElement && messagesElement.getAttribute('data-message-key')) {
+            const messageKey = messagesElement.getAttribute('data-message-key');
+            displayMessage(getTranslation(messageKey));
+        }
+    });
+}
+
+function handleGameStateUpdate(state) {
+    const { score, isComplete, difficulty, expressionChanged, lastSuccessfulRule } = state;
+
+    if (lastSuccessfulRule === 'simplify' && !expressionChanged) {
+        eventBus.publish(EVENTS.ERROR_OCCURRED, {
+            elementId: 'simplifyButton',
+            message: 'You cannot apply "simplify" twice in a row!'
+        });
+        return;
+    }
+
+    if (score !== undefined) {
+        const scoreElement = document.getElementById('currentScore');
+        if (scoreElement) {
+            scoreElement.textContent = score;
+        }
+    }
+
+    if (isComplete !== undefined) {
+        const messageKey = isComplete ? 'congratulations' : 'keepGoing';
+        displayMessage(getTranslation(messageKey), messageKey);
+    }
+
+    if (difficulty) {
+        updateDifficultyDisplay(difficulty);
+        const difficultySelect = document.getElementById('difficultySelect');
+        if (difficultySelect) {
+            difficultySelect.value = difficulty;
+        }
+    }
+}
+
+function handleRuleButtonClick(rule) {
+    eventBus.publish(EVENTS.RULE_APPLIED, { rule });
+}
+
 async function loadMathKeys() {
     const mathResponse = await fetch(`/locales/math.json`);
     return await mathResponse.json();
 }
 
-// Function to update UI translations dynamically (for non-math content)
 function updateUITranslations() {
-    // Update UI elements with static translations
     document.querySelectorAll('[data-translation-key]').forEach((element) => {
         const key = element.getAttribute('data-translation-key');
         const translation = getTranslation(key);
@@ -81,25 +139,34 @@ function updateUITranslations() {
             element.textContent = translation;
         }
     });
+
+    // Also update any dynamic messages
+    const messagesElement = document.getElementById('messages');
+    if (messagesElement && messagesElement.getAttribute('data-current-key')) {
+        const currentKey = messagesElement.getAttribute('data-current-key');
+        messagesElement.textContent = getTranslation(currentKey);
+    }
 }
 
-// Inject math expressions dynamically into elements with `data-math-key`
+async function initializeMathContent() {
+    await injectMathContent();
+    renderMathGlobally();
+}
+
 async function injectMathContent() {
     let mathTranslations = await loadMathKeys();
-
     document.querySelectorAll('[data-math-key]').forEach((element) => {
         const key = element.getAttribute('data-math-key');
         const katexExpression = mathTranslations[key];
         if (katexExpression) {
-            element.textContent = katexExpression; // Inject raw LaTeX string
+            element.textContent = katexExpression;
         } else {
             console.warn(`Math key not found: ${key}`);
-            element.textContent = ''; // Clear content if key not found
+            element.textContent = '';
         }
     });
 }
 
-// Render KaTeX globally for all math expressions with delimiters
 function renderMathGlobally() {
     renderMathInElement(document.body, {
         delimiters: [
@@ -107,6 +174,12 @@ function renderMathGlobally() {
             { left: "\\[", right: "\\]", display: true },
         ],
         throwOnError: false,
+    });
+}
+
+function setupMultipleButtons(buttonConfigs, callback) {
+    buttonConfigs.forEach(({ id, rule }) => {
+        setupButton(id, () => callback(rule));
     });
 }
 
@@ -120,56 +193,33 @@ function setupButton(buttonId, callback) {
     }
 }
 
-function setupMultipleButtons(buttonConfigs, callback) {
-    buttonConfigs.forEach(({ id, rule }) => {
-        setupButton(id, () => {
-            if (rule === 'simplify' && lastAppliedRule === 'simplify') {
-                // Trigger error animation if "simplify" is clicked twice in a row
-                triggerErrorAnimation(id, 'You cannot apply "simplify" twice in a row!');
-                return;
-            }
-
-            // Update the last applied rule
-            lastAppliedRule = rule;
-
-            // Execute the callback for the rule
-            callback(rule);
-        });
-    });
-}
-
-export function resetLastAppliedRule() {
-    lastAppliedRule = null;
-}
-
-export function renderWithAnimation(elementId, katexString) {
+function renderWithAnimation(elementId, katexString) {
     const element = document.getElementById(elementId);
-
     if (!element) {
         console.error(`Element with ID ${elementId} not found`);
         return;
     }
 
     console.log(`Rendering KaTeX string for element ${elementId}:`, katexString);
-    element.textContent = ''; // Clear previous content
-    element.classList.remove('animate'); // Remove the animation class
-    katex.render(katexString, element); // Render the KaTeX
-
-    void element.offsetWidth; // Trigger reflow to restart animation
-    element.classList.add('animate'); // Add animation class
+    element.textContent = '';
+    element.classList.remove('animate');
+    katex.render(katexString, element);
+    void element.offsetWidth;
+    element.classList.add('animate');
 }
 
-export function displayMessage(message) {
-    console.log('Displaying message:', message);
+// When displaying messages, store the translation key
+function displayMessage(message, messageKey = null) {
     const messagesElement = document.getElementById('messages');
     if (messagesElement) {
         messagesElement.textContent = message;
-    } else {
-        console.error('Messages element not found');
+        if (messageKey) {
+            messagesElement.setAttribute('data-message-key', messageKey);
+        }
     }
 }
 
-export function triggerErrorAnimation(elementId, errorMessage) {
+function triggerErrorAnimation(elementId, errorMessage) {
     const element = document.getElementById(elementId);
     if (element) {
         console.log(`Triggering error animation for ${elementId}:`, errorMessage);
@@ -178,4 +228,25 @@ export function triggerErrorAnimation(elementId, errorMessage) {
     } else {
         console.error(`Element with ID ${elementId} not found for error animation`);
     }
+}
+
+function updateDifficultyDisplay(difficulty) {
+    const difficultyElement = document.getElementById('currentDifficulty');
+    const multiplierElement = document.getElementById('difficultyMultiplier');
+
+    if (difficultyElement) {
+        const translationKey = `difficulty${capitalizeFirstLetter(difficulty)}`;
+        difficultyElement.textContent = getTranslation(translationKey);
+        // Store the translation key for future updates
+        difficultyElement.setAttribute('data-translation-key', translationKey);
+    }
+
+    if (multiplierElement) {
+        const multiplier = gameConfig.difficultyMultipliers[difficulty];
+        multiplierElement.textContent = `${multiplier}x`;
+    }
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }

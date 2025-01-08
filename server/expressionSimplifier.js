@@ -88,7 +88,7 @@ function convertNode(node) {
 
 const simplificationRules = [
     { l: "n1/n2/n3", r: "n1/(n2*n3)", repeat: true },
-    { l: "n1/n2*n3", r: "(n1*n3)/n2" },
+    { l: "-1 * n", r: "-n" },
 ]
 
 function simplifySubExpression(node) {
