@@ -8,7 +8,7 @@ function isSimpleDerivativeOf(tree, funcName) {
     return tree.type === 'derivative' &&
         tree.tree.type === 'function' &&
         tree.tree.name.toLowerCase() === funcName.toLowerCase() &&
-        JSON.stringify(tree.tree.argument) === JSON.stringify(tree.variable);
+        tree.tree.argument === tree.variable;
 }
 
 export function applyExpRule(tree) {
