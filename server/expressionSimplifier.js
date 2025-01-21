@@ -70,7 +70,7 @@ function convertNode(node) {
                 if (node.name === 'derivative') {
                     return createDerivative(
                         convertNode(node.args[0]),
-                        node.args[1].name
+                        node.args[1]
                     );
                 }
                 return createFunction(node.name, convertNode(node.args[0]));
@@ -98,10 +98,8 @@ function simplifySubExpression(node) {
     }
     try {
         const mathjsExpr = treeToMathjs(node);
-        console.log('mathjs expression to simplify:', mathjsExpr);
         const simplified1 = math.simplify(mathjsExpr);
         const simplified2 = math.simplify(simplified1, simplificationRules);
-        console.log('simplified expression as string:', math.string(simplified2));
         const result = mathjsToTree(simplified2);
         if (!result) {
             console.error('mathjsToTree returned null, falling back to original node');
@@ -134,7 +132,9 @@ function simplifyExpressionTree(node, isTopLevel = true) {
                 const newFunc = createFunction(node.name, simplifiedArg);
                 return isTopLevel ? simplifySubExpression(newFunc) : newFunc;
             case 'derivative':
+                console.log('Before simplifying derivative:', node);
                 const simplifiedExpr = simplifyExpressionTree(node.tree, true);
+                console.log('After simplifying derivative:', simplifiedExpr);
                 return createDerivative(simplifiedExpr, node.variable);
             default:
                 console.error('Unknown node type in simplifyExpressionTree:', node.type);
