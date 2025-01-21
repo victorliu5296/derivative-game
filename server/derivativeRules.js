@@ -125,7 +125,7 @@ export function applyChainRule(tree) {
     const innerFunction = tree.tree.argument;
 
     // Check if the differentiation variable matches the function argument
-    if (JSON.stringify(tree.variable) !== JSON.stringify(innerFunction)) {
+    if (tree.variable !== innerFunction) {
         // Apply the chain rule
         return createBinaryOp('*',
             createDerivative(
